@@ -1,0 +1,35 @@
+
+.custom_input{
+    width: 70px !important;
+}
+.datepicker table tr td.active.active
+{
+    background-color: #47A447 !important;
+    border: 1px solid #e6e6e6 !important;
+    color: #fff !important;
+    background-image: linear-gradient(to bottom,#47A447,#47A447);
+}
+.ranges li {
+
+    color: #47A447 !important;
+
+}
+.ranges li.active {
+    background-color: #47A447 !important;
+    border: 1px solid #e6e6e6 !important;
+    color: #fff !important;
+}
+.ranges li:hover {
+    background-color: #47A447 !important;
+    border: 1px solid #e6e6e6 !important;
+    color: #fff !important; }
+
+.daterangepicker td.active, .daterangepicker td.active:hover {
+    background-color: #47A447 !important;
+    border-color: transparent;
+    color: #fff !important;
+}
+.daterangepicker .input-mini.active {
+    border: 1px solid #e6e6e6 !important;
+    border-radius: 4px;
+}

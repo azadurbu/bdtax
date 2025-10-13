@@ -1,0 +1,1212 @@
+©<?php
+
+class PaymentController extends Controller
+{
+
+	public $layout='//layouts/columnLess';
+	public $defaultAction = 'index';
+
+	
+	
+	public function filters()
+	{
+		return array('accessControl',); // perform access control for CRUD operations
+	}
+
+	
+	public function accessRules()
+	{
+		return array(
+			array('allow', // allow authenticated user to perform 'create' and 'update' actions
+				'actions' => array('index', 'success', 'fail', 'cancel'),
+				'users' => array('@'),
+				'expression' => '(Yii::app()->user->role==="customers"||Yii::app()->user->role==="companyAdmin")',
+				),
+			array('allow', 
+				'actions' => array('org', 'orgSuccess', 'orgFail', 'orgCancel', 'IPNListener'), 
+				'users' => array('*')
+			),
+			array('deny',  // deny all users
+				'users'=>array('*'),
+				),
+
+			);
+	}
+
+
+
+	public function actionView($id)
+	{
+		$this->render('view',array(
+			'model'=>$this->loadModel($id),
+			));
+	}
+
+	/**
+	* Creates a new model.
+	* If creation is successful, the browser will be redirected to the 'view' page.
+	*/
+
+
+	/**
+	* Lists all models.
+	*/
+	public function actionIndex()
+	{
+		
+
+		Yii::import('application.vendors.*');
+
+		require_once('SSLCommerz/SSLCZConfig.php');
+		require_once('SSLCommerz/SSLCommerz.php');
+
+		$post_data = array();
+		
+		$post_data['currency'] = Yii::app()->params['currency'];
+		//$post_data['tran_id'] = uniqid();
+		$post_data['success_url'] = Yii::app()->params['successUrl'];
+		$post_data['fail_url'] = Yii::app()->params['failUrl'];
+		$post_data['cancel_url'] = Yii::app()->params['cancelUrl'];
+		$post_data['emi_option'] = 0;
+		
+		$sslc = new SSLCommerz();
+
+		if (Yii::app()->user->role === "customers") {
+			if(round($this->TaxLeviableOnTotalIncome(Yii::app()->user->CPIId)) <= 0){
+				$plan = "plan='Zero Tax'";
+			}elseif(round($this->TaxLeviableOnTotalIncome(Yii::app()->user->CPIId)) > 0){
+				$plan = "plan='Premier'";
+			}
+			
+			$individualPlan = IndividualPlan::model()->find(
+			array(
+				'condition' => $plan
+				)
+			);
+			$serviceCharge = $individualPlan->price;
+			$tax = 0;//Yii::app()->params['tax'];
+			$tax_amount = 0;
+			$discount_text = "";
+			$voucher = Vouchers::model()->find(
+                        array(
+                            'condition' => "user_id='".Yii::app()->user->id."' AND is_used='No' ",
+                            'order' => 'created_at DESC'
+                            )
+                    );
+			$voucher = null; //please remove this line to active discount
+
+			$role = Role::model()->find('role=:data',array(':data'=> Yii::app()->user->role));
+
+			$payment = Payments::model()->find(
+				array(
+					'condition' => "role_id='".$role->id."' AND CPIId='".Yii::app()->user->CPIId."' AND user_id='".Yii::app()->user->id."' AND payment_year='".$this->taxYear()."' AND status = 'VALID' ", 
+					'order' => 'payment_date DESC'
+					)
+				);
+
+			if ($payment == null) {
+				$payment = Payments::model()->find(
+				array(
+					'condition' => "role_id='".$role->id."' AND CPIId='".Yii::app()->user->CPIId."' AND user_id='".Yii::app()->user->id."' AND payment_year='".$this->taxYear()."' AND status != 'VALID' ", 
+					'order' => 'payment_date DESC'
+					)
+				);
+
+				$_SESSION['tran_id'] = "BDTAX_".Yii::app()->user->CPIId."_".uniqid(rand(0,9999)."-");
+				$post_data['tran_id'] = $_SESSION['tran_id'];
+				$post_data['value_a'] = Yii::app()->user->email;
+
+/* ####################   CALCULATE DISCOUNT & TAX #################### */					
+				$discount = 0;
+				if ( $voucher != null ) {
+					if ( $voucher->discount_type == "PERCENT" ) {
+						$discount = $individualPlan->price - ($individualPlan->price * $voucher->discount_value / 100);
+						$discount_text = $voucher->discount_value . "%";
+					}
+					else {
+						$discount = $individualPlan->price - $voucher->discount_value;
+						$discount_text = $voucher->discount_value . " " . $this->currency;
+					}
+					$total_with_discount_tax = ($tax * $discount / 100) + $discount;
+					$tax_amount = ($tax * $discount / 100);
+				}
+				else {
+					$total_with_discount_tax = ($tax * $individualPlan->price / 100) + $individualPlan->price;
+					$tax_amount = ($tax * $individualPlan->price / 100);
+				}
+				$total_with_discount_tax = number_format((float)$total_with_discount_tax, 2, '.', '');
+				$post_data['total_amount'] = $total_with_discount_tax;
+/* ####################  END - CALCULATE DISCOUNT & TAX #################### */	
+
+				if ($post_data['total_amount'] <= 0) {
+					Yii::app()->user->setFlash('payment_error', "Invalid balance.");
+					$options = array();
+				}
+				else {
+					$user = Users::model()->findByPk(Yii::app()->user->id);
+					$post_data['cus_name'] = $user->first_name." ".$user->middle_name." ".$user->last_name;
+					$post_data['cus_email'] = $user->email;
+					$post_data['cus_phone'] = $user->mobile;
+
+/* ####################   STORE THIS TRANSACTION AS PENDING STATUS #################### */
+					$tmpPayment = new TmpPayments;
+					$tmpPayment->role_id = $role->id;
+					$tmpPayment->CPIId = Yii::app()->user->CPIId;
+					$tmpPayment->user_id = Yii::app()->user->id;
+					$tmpPayment->payment_date = date("Y-m-d H:i:s");
+					$tmpPayment->payment_year = $this->taxYear();
+					$tmpPayment->tran_id = $post_data['tran_id'];
+					$tmpPayment->currency = $post_data['currency'];
+					$tmpPayment->amount = $post_data['total_amount'];
+					$tmpPayment->status = "PENDING";
+					$tmpPayment->value_a = $post_data['value_a'];
+					$tmpPayment->cus_name = $post_data['cus_name'];
+					$tmpPayment->cus_email = $post_data['cus_email'];
+					$tmpPayment->cus_phone = $post_data['cus_phone'];
+					$tmpPayment->voucher_id = (isset($voucher->id) ? $voucher->id : NULL);
+					$tmpPayment->emi_option = 0;
+					$tmpPayment->save(false);
+/* ################   END OF - STORE THIS TRANSACTION AS PENDING STATUS ################# */
+
+					$options = $sslc->initiate($post_data, true);
+				}
+
+
+				
+				$this->render('individual',array(
+					'options'=>$options,
+					'individualPlan'=>$individualPlan,
+					'payment' => $payment,
+					'allPaymentThisYear' => $payment,
+					'serviceCharge' => $serviceCharge,
+					'tax' => $tax,
+					'tax_amount' => $tax_amount,
+					'discount_text' => $discount_text,
+					'total_with_discount_tax' => $total_with_discount_tax,
+					'voucher' => $voucher,
+					));
+
+			}
+			else {
+				$allPaymentThisYear = Payments::model()->findAll(
+					array(
+						'condition' => "role_id='".$role->id."' AND CPIId='".Yii::app()->user->CPIId."' AND user_id='".Yii::app()->user->id."' AND payment_year='".$this->taxYear()."' AND status = 'VALID' ", 
+						'order' => 'payment_date DESC'
+						)
+					);
+				$amount = 0;
+				foreach($allPaymentThisYear as $d){
+					$amount += $d->amount;
+				}
+				if($serviceCharge >= $amount){
+					$_SESSION['tran_id'] = "BDTAX_".Yii::app()->user->CPIId."_".uniqid(rand(0,9999)."-");
+					$post_data['tran_id'] = $_SESSION['tran_id'];
+					$post_data['value_a'] = Yii::app()->user->email;
+					$post_data['total_amount'] = round($serviceCharge - $amount);
+					$user = Users::model()->findByPk(Yii::app()->user->id);
+					$post_data['cus_name'] = $user->first_name." ".$user->middle_name." ".$user->last_name;
+					$post_data['cus_email'] = $user->email;
+					$post_data['cus_phone'] = $user->mobile;
+					
+/* ####################   STORE THIS TRANSACTION AS PENDING STATUS #################### */
+					$tmpPayment = new TmpPayments;
+					$tmpPayment->role_id = $role->id;
+					$tmpPayment->CPIId = Yii::app()->user->CPIId;
+					$tmpPayment->user_id = Yii::app()->user->id;
+					$tmpPayment->payment_date = date("Y-m-d H:i:s");
+					$tmpPayment->payment_year = $this->taxYear();
+					$tmpPayment->tran_id = $post_data['tran_id'];
+					$tmpPayment->currency = $post_data['currency'];
+					$tmpPayment->amount = $post_data['total_amount'];
+					$tmpPayment->status = "PENDING";
+					$tmpPayment->value_a = $post_data['value_a'];
+					$tmpPayment->cus_name = $post_data['cus_name'];
+					$tmpPayment->cus_email = $post_data['cus_email'];
+					$tmpPayment->cus_phone = $post_data['cus_phone'];
+					$tmpPayment->voucher_id = (isset($voucher->id) ? $voucher->id : NULL);
+					$tmpPayment->emi_option = 0;
+					$tmpPayment->save(false);
+/* ################   END OF - STORE THIS TRANSACTION AS PENDING STATUS ################# */
+					$options = $sslc->initiate($post_data, true);
+				}else{
+					$options = array();
+				}
+				$this->render('individual',array(
+					'options'=>$options,
+					'individualPlan'=>"",
+					'payment' => $payment,
+					'allPaymentThisYear' => $allPaymentThisYear,
+					'serviceCharge' => $serviceCharge,
+					'tax' => $tax,
+					'tax_amount' => $tax_amount,
+					'discount_text' => "",
+					'total_with_discount_tax' => round($serviceCharge - $amount),
+					'voucher' => $voucher,
+					));
+			}
+
+		}
+		
+		/*else if (Yii::app()->user->role === "companyAdmin" && Yii::app()->user->CPIId != "companyAdmin") {
+
+			$dataProvider="";
+			$this->render('company');
+		}*/
+		/*else if (Yii::app()->user->role === "companyAdmin") {
+			Yii::app()->user->setFlash('payment_error', "You do not have access to this page");
+			$this->render('index');
+		}*/
+		else {
+			Yii::app()->user->setFlash('payment_error', "You do not have access to this page");
+			$this->render('index');
+		}
+		
+
+	}
+
+	public function actionSuccess()
+	{
+		if ( isset($_SESSION['tran_id']) ) {
+			$payment = Payments::model()->find('tran_id=:data',array(':data'=> $_SESSION['tran_id']));
+			if ( isset($payment->status) && $payment->status == "VALID" ) {
+				Yii::app()->user->setFlash('payment_success', "Your payment has been completed successfully");
+			}
+			else {
+				Yii::app()->user->setFlash('payment_success', "We are validating your payment. Please wait for some time." );
+			}
+		}
+
+		//Yii::app()->user->setFlash('payment_error', "Invalid request.");
+		$this->redirect(array('index'));
+		
+	}
+	public function actionFail()
+	{
+		if (!isset($_SESSION['tran_id'])) {
+			$this->redirect(array('dashboard'));
+		}
+		else {
+			try {
+				$role = Role::model()->find('role=:data',array(':data'=> Yii::app()->user->role));
+				
+				$payment = new Payments;
+				$payment->role_id = $role->id;
+
+				if (Yii::app()->user->role == "customers") {
+					$payment->CPIId = Yii::app()->user->CPIId;
+					$payment->user_id = Yii::app()->user->id;
+				}
+				else {
+					$payment->CPIId = NULL;
+					$payment->user_id = Yii::app()->user->id;
+				}
+				$payment->payment_date = date("Y-m-d H:i:s");
+				$payment->payment_year = $this->taxYear();
+				$payment->tran_id = $_SESSION['tran_id'];
+				$payment->val_id = @$_POST['val_id'];
+				$payment->amount = @$_POST['amount'];
+				$payment->card_type = @$_POST['card_type'];
+				$payment->store_amount = @$_POST['store_amount'];
+				$payment->card_no = @$_POST['card_no'];
+				$payment->bank_tran_id = @$_POST['bank_tran_id'];
+				$payment->status = (isset($_POST['status']) ? $_POST['status'] : "FAILED");
+				$payment->error = @$_POST['error'];
+				$payment->tran_date = @$_POST['tran_date'];
+				$payment->currency = @$_POST['currency'];
+				$payment->card_issuer = @$_POST['card_issuer'];
+				$payment->card_brand = @$_POST['card_brand'];
+				$payment->card_issuer_country = @$_POST['card_issuer_country'];
+				$payment->card_issuer_country_code = @$_POST['card_issuer_country_code'];
+				$payment->store_id = @$_POST['store_id'];
+				$payment->verify_sign = @$_POST['verify_sign'];
+				$payment->verify_key = @$_POST['verify_key'];
+				$payment->currency_type = @$_POST['currency_type'];
+				$payment->currency_amount = @$_POST['currency_amount'];
+				$payment->currency_rate = @$_POST['currency_rate'];
+				$payment->base_fair = @$_POST['base_fair'];
+				$payment->value_a = @$_POST['value_a'];
+				$payment->value_b = @$_POST['value_b'];
+				$payment->value_c = @$_POST['value_c'];
+				$payment->value_d = @$_POST['value_d'];
+				$payment->risk_level = @$_POST['risk_level'];
+				$payment->risk_title = @$_POST['risk_title'];
+
+				$payment->cus_name = @$_POST['cus_name'];
+				$payment->cus_email = @$_POST['cus_email'];
+				$payment->cus_phone = @$_POST['cus_phone'];
+				$payment->emi_option = 0;
+
+				$payment->save(false);
+
+				TmpPayments::model()->findByPk( $_SESSION['tran_id'] )->delete();
+				
+				unset($_SESSION['tran_id']);
+
+				
+				Yii::app()->user->setFlash('payment_error', "Transaction failed. " . @$_POST['error']);
+
+				$name = Yii::app()->user->first_name . " " . Yii::app()->user->last_name;
+				$this->_sendPaymentEmail(false, Yii::app()->user->email, $name, $payment, false);
+
+				// $this->_sendGiftCodeEmail(Yii::app()->user->email, $name);
+
+				$this->redirect(array('index'));
+				
+			} catch(Exception $e) {
+				unset($_SESSION['tran_id']);
+			  	Yii::app()->user->setFlash('payment_error', "Transaction failed. " . $e->getMessage());
+					$this->redirect(array('index'));
+			}
+		}
+		
+	}
+	public function actionCancel()
+	{
+		if (!isset($_SESSION['tran_id'])) {
+			$this->redirect(array('dashboard'));
+		}
+		else {
+			try {
+				$role = Role::model()->find('role=:data',array(':data'=> Yii::app()->user->role));
+				//Role::model()->findByPk($user->role_id)->role
+				$payment = new Payments;
+				$payment->role_id = $role->id;
+
+				if (Yii::app()->user->role == "customers") {
+					$payment->CPIId = Yii::app()->user->CPIId;
+					$payment->user_id = Yii::app()->user->id;
+				}
+				else {
+					$payment->CPIId = NULL;
+					$payment->user_id = Yii::app()->user->id;
+				}
+				$payment->payment_date = date("Y-m-d H:i:s");
+				$payment->payment_year = $this->taxYear();
+				$payment->tran_id = $_SESSION['tran_id'];
+				$payment->val_id = @$_POST['val_id'];
+				$payment->amount = @$_POST['amount'];
+				$payment->card_type = @$_POST['card_type'];
+				$payment->store_amount = @$_POST['store_amount'];
+				$payment->card_no = @$_POST['card_no'];
+				$payment->bank_tran_id = @$_POST['bank_tran_id'];
+				$payment->status = (isset($_POST['status']) ? $_POST['status'] : "FAILED");
+				$payment->error = @$_POST['error'];
+				$payment->tran_date = @$_POST['tran_date'];
+				$payment->currency = @$_POST['currency'];
+				$payment->card_issuer = @$_POST['card_issuer'];
+				$payment->card_brand = @$_POST['card_brand'];
+				$payment->card_issuer_country = @$_POST['card_issuer_country'];
+				$payment->card_issuer_country_code = @$_POST['card_issuer_country_code'];
+				$payment->store_id = @$_POST['store_id'];
+				$payment->verify_sign = @$_POST['verify_sign'];
+				$payment->verify_key = @$_POST['verify_key'];
+				$payment->currency_type = @$_POST['currency_type'];
+				$payment->currency_amount = @$_POST['currency_amount'];
+				$payment->currency_rate = @$_POST['currency_rate'];
+				$payment->base_fair = @$_POST['base_fair'];
+				$payment->value_a = @$_POST['value_a'];
+				$payment->value_b = @$_POST['value_b'];
+				$payment->value_c = @$_POST['value_c'];
+				$payment->value_d = @$_POST['value_d'];
+				$payment->risk_level = @$_POST['risk_level'];
+				$payment->risk_title = @$_POST['risk_title'];
+
+				$payment->cus_name = @$_POST['cus_name'];
+				$payment->cus_email = @$_POST['cus_email'];
+				$payment->cus_phone = @$_POST['cus_phone'];
+				$payment->emi_option = 0;
+
+				$payment->save(false);
+
+				TmpPayments::model()->findByPk( $_SESSION['tran_id'] )->delete();
+				
+				unset($_SESSION['tran_id']);
+
+				$name = Yii::app()->user->first_name . " " . Yii::app()->user->last_name;
+				// $this->_sendGiftCodeEmail(Yii::app()->user->email, $name);
+
+				
+				Yii::app()->user->setFlash('payment_error', "Transaction has been cancelled. " /*. @$_POST['error']*/);
+				
+
+				//$name = Yii::app()->user->first_name . " " . Yii::app()->user->last_name;
+				//$this->_sendPaymentEmail(false, Yii::app()->user->email, $name, $payment, false);
+
+				$this->redirect(array('index'));
+				
+			} catch(Exception $e) {
+				unset($_SESSION['tran_id']);
+
+			  	Yii::app()->user->setFlash('payment_error', "Transaction has been cancelled. " . $e->getMessage());
+
+				$this->redirect(array('index'));
+			}
+				
+		}
+	}
+
+	public function actionOrg() {
+
+		if ( isset($_GET['v']) && $_GET['v'] != "" ) {
+			$v = urldecode(base64_decode($_GET['v']));
+
+			parse_str($v, $values);
+
+			$date = explode(",", $values['value_b']);
+
+			$start = $date[0];
+			$end = $date[1];
+
+			$tmpP = Payments::model()->find('tran_id=:data',array(':data'=> $values['tran_id']));
+			if ($tmpP) {
+				die("This link is already been used.");
+			}
+
+
+			if( strtotime(date("Y-m-d", strtotime($start))) > strtotime(date("Y-m-d", strtotime($end))) ) {
+				die("Wrong date range.");
+			}
+			$values['value_a'] = (int) $values['value_a'];
+			$model = $this->loadOrgModel( $values['value_a'] );
+
+			$paymentMethod = PaymentMethod::model()->findByPk($model->payment_method_id);
+
+
+
+			if ($paymentMethod == null) {
+				die("Payment method does not found.");
+			}
+			else {
+				
+				if ( $values['total_amount'] == 0 ) {
+					die("Zero payment is not valid.");
+				}
+
+				Yii::import('application.vendors.*');
+
+				require_once('SSLCommerz/SSLCZConfig.php');
+				require_once('SSLCommerz/SSLCommerz.php');
+
+				$post_data = array();
+
+				$post_data['currency'] = Yii::app()->params['currency'];
+
+				$post_data['success_url'] = Yii::app()->params['orgSuccessUrl'];
+				$post_data['fail_url'] = Yii::app()->params['orgFailUrl'];
+				$post_data['cancel_url'] = Yii::app()->params['orgCancelUrl'];
+
+				$post_data['value_a'] = $values['value_a'];
+				$post_data['value_b'] = $values['value_b'];
+				$post_data['value_c'] = $model->contact_email;
+				$post_data['value_d'] = $values['cus_email'];
+
+				$post_data['tran_id'] = $values['tran_id'];
+				$post_data['emi_option'] = 0;
+				
+
+				if ( $values['cus_email'] == "" ) {
+					$post_data['cus_name'] = $model->contact_first_name . " " . $model->contact_last_name;
+					$post_data['cus_email'] = $model->contact_email;
+					$post_data['cus_phone'] = $model->phone_number;
+				}
+				else {
+					$post_data['cus_email'] = $values['cus_email'];
+				}
+
+				
+				
+				
+
+				$post_data['total_amount'] = $values['total_amount'];
+
+				$voucher = Vouchers::model()->find(
+								array(
+									'condition' => "org_id='".$values['value_a']."' AND is_used='No' ", 
+									'order' => 'created_at DESC'
+									)
+							);
+
+/* ####################   STORE THIS TRANSACTION AS PENDING STATUS #################### */
+				
+				$tmp = TmpPayments::model()->findByPk($post_data['tran_id']);
+				if ($tmp) $tmp->delete();
+
+				$tmpPayment = new TmpPayments;
+				$tmpPayment->role_id = 3;
+				$tmpPayment->org_id = $values['value_a'];
+				
+				$tmpPayment->payment_from = $start;
+				$tmpPayment->payment_to = $end;
+
+				$tmpPayment->payment_date = date("Y-m-d H:i:s");
+				
+				$tmpPayment->tran_id = $post_data['tran_id'];
+				$tmpPayment->currency = $post_data['currency'];
+				$tmpPayment->amount = $post_data['total_amount'];
+				$tmpPayment->status = "PENDING";
+
+				$tmpPayment->value_a = $post_data['value_a'];
+				$tmpPayment->value_b = $post_data['value_b'];
+				$tmpPayment->value_c = $post_data['value_c'];
+				$tmpPayment->value_d = $post_data['value_d'];
+
+				$tmpPayment->cus_name = @$post_data['cus_name'];
+				$tmpPayment->cus_email = $post_data['cus_email'];
+				$tmpPayment->cus_phone = @$post_data['cus_phone'];
+				$tmpPayment->voucher_id = (isset($voucher->id) ? $voucher->id : NULL);
+				$tmpPayment->emi_option = 0;
+				$tmpPayment->save(false);
+/* ################   END OF - STORE THIS TRANSACTION AS PENDING STATUS ################# */
+
+				$sslc = new SSLCommerz();
+
+				$options = $sslc->initiate($post_data, true);
+
+				$paymentLink = "";
+
+				foreach ($options as $keys => $values) {
+					foreach ($values as $key => $value) {
+						if ( $value['gw'] ==  $paymentMethod->gw ) {
+							$paymentLink = $value['raw_link'];
+						}
+					}
+				}
+				if ($paymentLink == "") {
+					die($paymentMethod->name . " is not available.");
+				}
+				$this->redirect($paymentLink);
+			}
+	
+		}
+		else {
+			$this->redirect($this->createAbsoluteUrl('/'));
+		}
+	}
+
+
+	public function actionOrgSuccess() {
+		$this->layout ='//layouts/main';
+		$payment = null;
+
+		if ( isset($_POST['tran_id']) && isset($_POST['value_a']) ) {
+			$model = Organizations::model()->findByPk($_POST['value_a']);
+
+			if( $model == null ) {
+				Yii::app()->user->setFlash('payment_error', "Organization does not found.");
+				$this->render('company',array(
+					'payment' => $payment,
+				));
+			}
+
+			$payment = Payments::model()->find('tran_id=:data',array(':data'=> $_POST['tran_id']));
+
+			if ( isset($payment->status) && $payment->status == "VALID" ) {
+				Yii::app()->user->setFlash('payment_success', "Your payment has been completed successfully");
+			}
+			else {
+				Yii::app()->user->setFlash('payment_success', "We are validating your payment. Please wait for some time." );
+			}
+			$this->render('company',array(
+					'payment' => $payment,
+				));
+			
+		}
+		else {
+			$this->redirect($this->createAbsoluteUrl('/'));
+		}
+
+		
+	}
+
+	public function actionOrgFail() {
+		
+		$this->layout ='//layouts/main';
+		$payment = null;
+
+		if ( isset($_POST['tran_id']) && isset($_POST['value_a']) ) {
+			
+			$model = Organizations::model()->findByPk($_POST['value_a']);
+
+			if( $model == null ) {
+				Yii::app()->user->setFlash('payment_error', "Organization does not found.");
+				//$this->redirect(array('orgFail'));
+				$this->render('company',array(
+					'payment' => $payment,
+				));
+			}
+
+			$date = explode(",", $_POST['value_b']);
+
+			try {
+				$payment = new Payments;
+				$payment->role_id = 3;
+				$payment->org_id = (int) $_POST['value_a'];
+				
+				$payment->payment_from = $date[0];
+				$payment->payment_to = $date[1];
+
+				$payment->payment_date = date("Y-m-d H:i:s");
+				$payment->tran_id = @$_POST['tran_id'];
+				$payment->val_id = @$_POST['val_id'];
+				$payment->amount = @$_POST['amount'];
+				$payment->card_type = @$_POST['card_type'];
+				$payment->store_amount = @$_POST['store_amount'];
+				$payment->card_no = @$_POST['card_no'];
+				$payment->bank_tran_id = @$_POST['bank_tran_id'];
+				$payment->status = @$_POST['status'];
+				$payment->error = @$_POST['error'];
+				$payment->tran_date = @$_POST['tran_date'];
+				$payment->currency = @$_POST['currency'];
+				$payment->card_issuer = @$_POST['card_issuer'];
+				$payment->card_brand = @$_POST['card_brand'];
+				$payment->card_issuer_country = @$_POST['card_issuer_country'];
+				$payment->card_issuer_country_code = @$_POST['card_issuer_country_code'];
+				$payment->store_id = @$_POST['store_id'];
+				$payment->verify_sign = @$_POST['verify_sign'];
+				$payment->verify_key = @$_POST['verify_key'];
+				$payment->currency_type = @$_POST['currency_type'];
+				$payment->currency_amount = @$_POST['currency_amount'];
+				$payment->currency_rate = @$_POST['currency_rate'];
+				$payment->base_fair = @$_POST['base_fair'];
+				$payment->value_a = @$_POST['value_a'];
+				$payment->value_b = @$_POST['value_b'];
+				$payment->value_c = @$_POST['value_c'];
+				$payment->value_d = @$_POST['value_d'];
+				$payment->risk_level = @$_POST['risk_level'];
+				$payment->risk_title = @$_POST['risk_title'];
+				$payment->save(false);
+				
+				Yii::app()->user->setFlash('payment_error', "Transaction failed. " . @$_POST['error']);
+
+				$name = $model->organization_name;
+				$this->_sendPaymentEmail(true, $model->contact_email, $name, $payment, false);
+				
+				$this->render('company',array(
+						'payment' => $payment,
+				));
+				
+			} catch(Exception $e) {
+				Yii::app()->user->setFlash('payment_error', "Transaction failed. " . $e->getMessage());
+				$this->render('company',array(
+					'payment' => $payment,
+				));
+			}
+		}
+		else {
+			$this->redirect($this->createAbsoluteUrl('/'));
+		}
+	}
+
+	public function actionOrgCancel() {
+		$this->layout ='//layouts/main';
+		if ( isset($_POST['tran_id']) && isset($_POST['value_a']) ) {
+			
+			$model = Organizations::model()->findByPk($_POST['value_a']);
+
+			if( $model == null ) {
+				Yii::app()->user->setFlash('payment_error', "Organization does not found.");
+				//$this->redirect(array('orgFail'));
+				$this->render('company',array(
+					'payment' => $payment,
+				));
+			}
+
+			$date = explode(",", $_POST['value_b']);
+
+			try {
+				$payment = new Payments;
+				$payment->role_id = 3;
+				$payment->org_id = (int) $_POST['value_a'];
+				
+				$payment->payment_from = $date[0];
+				$payment->payment_to = $date[1];
+
+				$payment->payment_date = date("Y-m-d H:i:s");
+				$payment->tran_id = @$_POST['tran_id'];
+				$payment->val_id = @$_POST['val_id'];
+				$payment->amount = @$_POST['amount'];
+				$payment->card_type = @$_POST['card_type'];
+				$payment->store_amount = @$_POST['store_amount'];
+				$payment->card_no = @$_POST['card_no'];
+				$payment->bank_tran_id = @$_POST['bank_tran_id'];
+				$payment->status = @$_POST['status'];
+				$payment->error = @$_POST['error'];
+				$payment->tran_date = @$_POST['tran_date'];
+				$payment->currency = @$_POST['currency'];
+				$payment->card_issuer = @$_POST['card_issuer'];
+				$payment->card_brand = @$_POST['card_brand'];
+				$payment->card_issuer_country = @$_POST['card_issuer_country'];
+				$payment->card_issuer_country_code = @$_POST['card_issuer_country_code'];
+				$payment->store_id = @$_POST['store_id'];
+				$payment->verify_sign = @$_POST['verify_sign'];
+				$payment->verify_key = @$_POST['verify_key'];
+				$payment->currency_type = @$_POST['currency_type'];
+				$payment->currency_amount = @$_POST['currency_amount'];
+				$payment->currency_rate = @$_POST['currency_rate'];
+				$payment->base_fair = @$_POST['base_fair'];
+				$payment->value_a = @$_POST['value_a'];
+				$payment->value_b = @$_POST['value_b'];
+				$payment->value_c = @$_POST['value_c'];
+				$payment->value_d = @$_POST['value_d'];
+				$payment->risk_level = @$_POST['risk_level'];
+				$payment->risk_title = @$_POST['risk_title'];
+				$payment->save(false);
+				
+				Yii::app()->user->setFlash('payment_error', "Transaction has been cancelled. " /*. @$_POST['error']*/);
+
+				//$name = $model->organization_name;
+				//$this->_sendPaymentEmail(true, $model->contact_email, $name, $payment, false);
+				
+				$this->render('company',array(
+						'payment' => $payment,
+				));
+				
+			} catch(Exception $e) {
+				Yii::app()->user->setFlash('payment_error', "Transaction has been cancelled. " . $e->getMessage());
+				$this->render('company',array(
+					'payment' => $payment,
+				));
+			}
+		}
+		else {
+			$this->redirect($this->createAbsoluteUrl('/'));
+		}
+		
+		
+	}
+
+	public function _sendPaymentEmail($isOrg, $email, $name, $payment, $isSuccess) {
+		
+		$mailBody = '<div id=":fz" class="a3s" style="width: 100%;">
+	        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+	            <tbody>
+	                <tr>
+	                    <td>
+	                        <table align="center" border="0" cellpadding="0" cellspacing="0" style="background-color:#f8f8f8" width="600">
+	                            <tbody>
+	                                <tr>
+	                                    <td align="center" style="color:#ffffff;font-family:Open Sans,Arial,Helvetica,sans-serif;font-size:18px;font-weight:bold;text-transform:uppercase;padding:20px 0;background-color:#FFF" valign="middle"> <img src="https://bdtax.com.bd/img/logo.png" class="CToWUd"></td>
+	                                </tr>
+	                                <tr>
+	                                    <td height="20">&nbsp;</td>
+	                                </tr>
+	                                <tr>
+	                                    <td style="padding: 15px; text-align: justify; text-justify: inter-word; color:#444444;font-family:Open Sans,Arial,Helvetica,sans-serif; font-size:14px;">
+	                                    	<p>';
+	                                    	if ($isSuccess == true) : 
+	                                    		$mailBody .= 'Thank you for your payment. Please keep the following payment receipt for your records.';
+	                                    	else:
+	                                    		$mailBody .= '<div style="color:red;"><b>Unfortunately your payment has been failed. Please log into <a href="'.$this->createAbsoluteUrl('/').'" target="_blank">BDTax.com.bd</a> to re-process your payment. Thank you.</b></div>';
+	                                    	endif;
+
+	                                    	$mailBody .= '<br>
+	                                    	</p>
+	                                        <p>
+	                                            <table style="width: 80%;">
+	                                                <tbody>';
+	                                        if ($isOrg == true) :
+                                                $mailBody .= '<tr>
+                                                    <th>Company Name</th>
+                                                    <td>
+                                                        '. $name .'
+                                                    </td>
+                                                </tr>';
+		                                    else :
+		                                    	$mailBody .= '<tr>
+                                                    <th>User Name</th>
+                                                    <td>
+                                                        '. $name .'
+                                                    </td>
+                                                </tr>';
+		                                    endif;
+
+	                                        $mailBody .= '<tr>
+	                                                        <th>Status</th>
+	                                                        <th>
+	                                                            '. $payment->status .'
+	                                                        </th>
+	                                                    </tr>
+	                                                    <tr>
+	                                                        <th>Transaction Date</th>
+	                                                        <td>
+	                                                            '. date("d/m/Y h:i A",strtotime($payment->tran_date)) .'
+	                                                        </td>
+	                                                    </tr>';
+	                                                    if ($isOrg == true) :
+		                                                    $mailBody .= '<tr>
+		                                                        <th>Duration</th>
+		                                                        <td>
+		                                                            '. date("d/m/Y",strtotime($payment->payment_from)) . ' to ' . date("d/m/Y",strtotime($payment->payment_to)) .'
+		                                                        </td>
+		                                                    </tr>';
+	                                                    else: 
+	                                                    	 $mailBody .= '<tr>
+	                                                    	    <th>Tax Year</th>
+	                                                    	    <td>
+	                                                    	        '. $payment->payment_year .'
+	                                                    	    </td>
+	                                                    	</tr>';
+	                                                    endif;
+
+	                                                    $mailBody .= '<tr>
+	                                                        <th>Transaction ID</th>
+	                                                        <td>
+	                                                            '. $payment->tran_id .'
+	                                                        </td>
+	                                                    </tr>
+	                                                    <tr>
+	                                                        <th>Amount</th>
+	                                                        <td>
+	                                                            '. $payment->amount .'
+	                                                        </td>
+	                                                    </tr>
+	                                                    <tr>
+	                                                        <th>Currency</th>
+	                                                        <td>
+	                                                            '.$payment->currency .'
+	                                                        </td>
+	                                                    </tr>
+	                                                    <tr>
+	                                                        <th>Card Type</th>
+	                                                        <td>
+	                                                            '. $payment->card_type .'
+	                                                        </td>
+	                                                    </tr>
+	                                                    <tr>
+	                                                        <th>Card Issuer</th>
+	                                                        <td>
+	                                                            '. $payment->card_issuer .'
+	                                                        </td>
+	                                                    </tr>
+
+	                                                    <tr>
+	                                                        <th>Bank Transaction ID</th>
+	                                                        <td>
+	                                                            '. $payment->bank_tran_id .'
+	                                                        </td>
+	                                                    </tr>';
+
+	                                                    if ($payment->error != "") : 
+	                                                	$mailBody .=  '<tr>
+	                                                            <th>Error</th>
+	                                                            <td>
+	                                                                '.$payment->error .'
+	                                                            </td>
+	                                                        </tr>';
+	                                                     endif;
+	                                                    $mailBody .= '<tr>
+	                                                        <td colspan="2" style="padding-top: 20px;">';
+	                                                    if ($isSuccess == true) : 
+			                                    		$mailBody .= 'Please <a href="'.$this->createAbsoluteUrl('/').'" target="_blank">log in</a>  to your account to download tax return form.';
+				                                    	else:
+				                                    		$mailBody .= '';
+				                                    	endif;
+
+				                                    	if ($isSuccess == true) : 
+				                                    		$mailBody .= '</td>
+	                                                    					</tr>
+	                                                    					<tr>
+	                                                    						<td colspan="2" style="text-align:center">
+                                                        							<a href="https://business.facebook.com/pg/bdtaxonline/reviews/"><img src = "https://jewelrydepot.com/wp-content/uploads/2017/09/Review-us-on-Facebook-300x174.png" width="180"></a>';
+				                                    	endif;
+	                                                            
+	                                                      	$mailBody .='</td>
+	                                                    </tr>
+
+	                                                    <tr>
+	                                                        <td colspan="2" style="padding-top: 50px; text-align: left;">
+	                                                            Thank you. <br>
+	                                                            Team <a href="'.$this->createAbsoluteUrl('/').'" target="_blank">BDTax.com.bd</a><br>
+	                                                            <a href="mailto:'.Yii::app()->params['billingEmail'].'">'.Yii::app()->params['billingEmail'].'</a>
+	                                                        </td>
+	                                                    </tr>
+	                                                </tbody>
+
+	                                            </table>
+	                                        </p>
+	                                    </td>
+
+	                                    <tr>
+	                                        <td style="padding: 15px; text-align: justify; text-justify: inter-word; color:#444444;font-family:Open Sans,Arial,Helvetica,sans-serif; font-size:14px;">&nbsp;</td>
+	                                    </tr>
+	                                </tr>
+	                            </tbody>
+	                        </table>
+	                    </td>
+	                </tr>
+	            </tbody>
+	        </table>
+	    </div>';
+
+	    if ($isSuccess == true) :
+	    	$subject = "Your BDTax Payment Has Been Successful!";
+	    else:
+	    	$subject = "Your BDTax Payment Has Been Failed!";
+	    endif;
+
+	    UserModule::sendBillingMail($email, $subject, $mailBody);
+		
+	}
+
+	public function _sendGiftCodeEmail($email, $name) {
+		
+		$mailBody = '<div id=":fz" class="a3s">
+		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%"> 
+			<tbody> <tr> <td>
+				<table align="center" border="0" cellpadding="0" cellspacing="0" style="background-color:#f8f8f8" width="600"> 
+					<tbody>
+						<tr> <td align="center" style="color:#ffffff;font-family:Open Sans,Arial,Helvetica,sans-serif;font-size:18px;font-weight:bold;text-transform:uppercase;padding:20px 0;background-color:#FFF" valign="middle"> <img src="https://bdtax.com.bd/img/logo.png" class="CToWUd"></td> </tr> 
+						<tr> <td height="20">&nbsp;</td> </tr> 
+						<tr> 
+							<td style="padding: 0 15px 0 15px; text-align: justify; text-justify: inter-word; color:#444444;font-family:Open Sans,Arial,Helvetica,sans-serif; font-size:14px;"> 
+
+								
+								Dear '.$name.',
+								<br><br><br>
+								Our records indicates that you were trying to make a payment to Download your completed tax return form. If you have any payment related problem, please reply back to this email and we will solve the problem.
+								<br><br>
+								Also as a valued member of <a href="https://bdtax.com.bd">bdtax.com.bd</a> we are offering a 30% discount coupon just for you. You can use "BDTAXTHANKYOU0654" code in the payment page to get the 30% discount.
+								<br><br>
+								Here is screen shot of where to enter the discount coupon: <a href="http://prntscr.com/gs59mu">http://prntscr.com/gs59mu</a>
+								<br><br>
+								Again, thank you very much for being a valued member of <a href="https://bdtax.com.bd">bdtax.com.bd</a>, Bangladesh\'s first online self guided tax preparation software.
+								<br><br>
+								If you have any questions, please email us at <a href="mailto:support@bdtax.com.bd">support@bdtax.com.bd</a> and we will get back to you right away.
+								<br><br><br>
+								Thank you.
+								
+							</td> 
+						</tr>
+						
+						<tr> <td height="20">&nbsp;</td> </tr> 
+					</tbody> 
+				</table> </td> </tr> 
+			</tbody>
+		</table> 
+	</div>';
+
+	   
+		$subject = "bdtax.com.bd payment - Discount Coupon";
+	   
+
+	    UserModule::sendBillingMail($email, $subject, $mailBody);
+		
+	}
+
+	public function loadOrgModel($id)
+	{
+		$model=Organizations::model()->findByPk($id);
+		if($model===null)
+			throw new CHttpException(404,'The requested page does not exist.');
+		return $model;
+	}
+
+	public function actionIPNListener() {
+		try {
+			if ( strtoupper($_SERVER['REQUEST_METHOD']) == "POST" && isset($_POST['tran_id']) ) {
+
+				$tmpPayment = TmpPayments::model()->find('tran_id=:data1',array(':data1'=> $_POST['tran_id']));
+
+
+				if ($tmpPayment == NULL) {
+					$this->writeIPNLog("Transaction=".$_POST['tran_id']." not found. ");
+					die();
+				}
+
+				if ( strtoupper(trim($_POST['status'])) != "VALID" ) {
+					$tmpPayment->status = $_POST['status'];
+					$tmpPayment->save(false);
+
+					$this->writeIPNLog("Transaction=".$_POST['tran_id'].". Status=".$_POST['status']);
+					die();
+				}
+
+
+
+				Yii::import('application.vendors.*');
+				require_once('SSLCommerz/SSLCZConfig.php');
+				require_once('SSLCommerz/SSLCommerz.php');
+
+				$sslc = new SSLCommerz();
+
+				if ($tmpPayment->role_id == 2) {
+					$user = Users::model()->findByPk($tmpPayment->user_id);
+
+					$voucher = Vouchers::model()->find(
+									array(
+										'condition' => "user_id='".$tmpPayment->user_id."' AND is_used='No' ", 
+										'order' => 'created_at DESC'
+										)
+								);
+				}
+				else {
+					$org = Organizations::model()->findByPk($tmpPayment->org_id);
+					$voucher = Vouchers::model()->find(
+								array(
+									'condition' => "org_id='".$tmpPayment->org_id."' AND is_used='No' ", 
+									'order' => 'created_at DESC'
+									)
+							);
+				}
+				
+
+				if ( $sslc->orderValidate($tmpPayment->tran_id, $tmpPayment->amount, $tmpPayment->currency, $_POST) ) {
+					
+
+					$payment = new Payments;
+					$payment->role_id = $tmpPayment->role_id;
+
+					$payment->CPIId = $tmpPayment->CPIId;
+					$payment->user_id = $tmpPayment->user_id;
+					$payment->org_id = $tmpPayment->org_id;
+
+					$payment->payment_date = date("Y-m-d H:i:s");
+
+					$payment->payment_year = $tmpPayment->payment_year;
+					$payment->payment_from = $tmpPayment->payment_from;
+					$payment->payment_to = $tmpPayment->payment_to;
+
+					$payment->tran_id = @$_POST['tran_id'];
+					$payment->val_id = @$_POST['val_id'];
+					$payment->amount = @$_POST['amount'];
+					$payment->card_type = @$_POST['card_type'];
+					$payment->store_amount = @$_POST['store_amount'];
+					$payment->card_no = @$_POST['card_no'];
+					$payment->bank_tran_id = @$_POST['bank_tran_id'];
+					$payment->status = @$_POST['status'];
+					$payment->error = @$_POST['error'];
+					$payment->tran_date = @$_POST['tran_date'];
+					$payment->currency = @$_POST['currency'];
+					$payment->card_issuer = @$_POST['card_issuer'];
+					$payment->card_brand = @$_POST['card_brand'];
+					$payment->card_issuer_country = @$_POST['card_issuer_country'];
+					$payment->card_issuer_country_code = @$_POST['card_issuer_country_code'];
+					$payment->store_id = @$_POST['store_id'];
+					$payment->verify_sign = @$_POST['verify_sign'];
+					$payment->verify_key = @$_POST['verify_key'];
+					$payment->currency_type = @$_POST['currency_type'];
+					$payment->currency_amount = @$_POST['currency_amount'];
+					$payment->currency_rate = @$_POST['currency_rate'];
+					$payment->base_fair = @$_POST['base_fair'];
+					$payment->value_a = @$_POST['value_a'];
+					$payment->value_b = @$_POST['value_b'];
+					$payment->value_c = @$_POST['value_c'];
+					$payment->value_d = @$_POST['value_d'];
+					$payment->risk_level = @$_POST['risk_level'];
+					$payment->risk_title = @$_POST['risk_title'];
+					$payment->cus_name = @$_POST['cus_name'];
+					$payment->cus_email = @$_POST['cus_email'];
+					$payment->cus_phone = @$_POST['cus_phone'];
+					$payment->emi_option = 0;
+					
+					if ($voucher != null) {
+						$payment->voucher_id = $voucher->id;
+					}
+
+					$payment->save(false);
+
+					//UPDATE GIFT VOUCHER
+					if ($voucher != null) {
+						$voucher->is_used = "Yes";
+						$voucher->save(false);
+					}
+					//END OF UPDATE GIFT VOUCHER
+
+					if ($tmpPayment->role_id == 2) {
+						$name = $user->first_name . " " . $user->last_name;
+						$this->_sendPaymentEmail(false, $user->email, $name, $payment, true);
+					}
+					else {
+						$this->_sendPaymentEmail(true, $org->contact_email, $org->organization_name, $payment, true);
+					}
+
+					
+
+					TmpPayments::model()->findByPk( $_POST['tran_id'] )->delete();
+
+					$this->writeIPNLog("Transaction=".$_POST['tran_id']." Successfully validated.");
+				}
+				else {
+					$payment = new Payments;
+					$payment->role_id = $tmpPayment->role_id;
+
+					$payment->CPIId = $tmpPayment->CPIId;
+					$payment->user_id = $tmpPayment->user_id;
+
+					$payment->payment_date = date("Y-m-d H:i:s");
+					$payment->payment_year = $tmpPayment->payment_year;
+					$payment->tran_id = @$_POST['tran_id'];
+					$payment->val_id = @$_POST['val_id'];
+					$payment->amount = @$_POST['amount'];
+					$payment->card_type = @$_POST['card_type'];
+					$payment->store_amount = @$_POST['store_amount'];
+					$payment->card_no = @$_POST['card_no'];
+					$payment->bank_tran_id = @$_POST['bank_tran_id'];
+					$payment->status = "FAILED";
+					$payment->error = @$_POST['error'] . "  " . @$sslc->error . " Status=".$_POST['status'];
+					$payment->tran_date = @$_POST['tran_date'];
+					$payment->currency = @$_POST['currency'];
+					$payment->card_issuer = @$_POST['card_issuer'];
+					$payment->card_brand = @$_POST['card_brand'];
+					$payment->card_issuer_country = @$_POST['card_issuer_country'];
+					$payment->card_issuer_country_code = @$_POST['card_issuer_country_code'];
+					$payment->store_id = @$_POST['store_id'];
+					$payment->verify_sign = @$_POST['verify_sign'];
+					$payment->verify_key = @$_POST['verify_key'];
+					$payment->currency_type = @$_POST['currency_type'];
+					$payment->currency_amount = @$_POST['currency_amount'];
+					$payment->currency_rate = @$_POST['currency_rate'];
+					$payment->base_fair = @$_POST['base_fair'];
+					$payment->value_a = @$_POST['value_a'];
+					$payment->value_b = @$_POST['value_b'];
+					$payment->value_c = @$_POST['value_c'];
+					$payment->value_d = @$_POST['value_d'];
+					$payment->risk_level = @$_POST['risk_level'];
+					$payment->risk_title = @$_POST['risk_title'];
+					$payment->cus_name = @$_POST['cus_name'];
+					$payment->cus_email = @$_POST['cus_email'];
+					$payment->cus_phone = @$_POST['cus_phone'];
+					$payment->emi_option = 0;
+					$payment->voucher_id = $tmpPayment->voucher_id;
+					
+					$payment->save(false);
+
+					if ($tmpPayment->role_id == 2) {
+						$name = $user->first_name . " " . $user->last_name;
+						$this->_sendPaymentEmail(false, $user->email, $name, $payment, false);
+					}
+					else {
+						$this->_sendPaymentEmail(true, $org->contact_email, $org->organization_name, $payment, false);
+					}
+
+					TmpPayments::model()->findByPk( $_POST['tran_id'] )->delete();
+
+					$this->writeIPNLog("Transaction=".$_POST['tran_id']." Failed to validated. Error: " . @$sslc->error);
+				}
+			}
+			else {
+				$this->writeIPNLog("Invalid request");
+			}
+		} catch ( Exception $e ) {
+	      	$this->writeIPNLog("Error Occurred. " . $e->getMessage());
+	    }
+
+
+	}
+
+	public function writeIPNLog($msg) {
+		try
+    	{
+    		$ip = " IP=".@$_SERVER['REMOTE_ADDR'].", PORT=".@$_SERVER['REMOTE_PORT'];
+			$filename = "log-" . date("Y.m.d") . ".txt";
+	    	$content = date("d-m-Y H.i.s") . " # " . $ip . " # Msg=". $msg . " # POST=" . json_encode(@$_POST) . "\r\n" . "\r\n";
+	    	$handle = @fopen("protected/runtime/IPNListener/" . $filename, "a+");
+	    	@fwrite($handle, $content);
+	    	@fclose($handle);
+	    	return true;
+	    } catch ( Exception $e ) {
+	      	return false;
+	    } 
+	}
+
+}

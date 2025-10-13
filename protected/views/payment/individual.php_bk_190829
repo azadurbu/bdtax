@@ -1,0 +1,307 @@
+<link href="<?php echo Yii::app()->request->baseUrl; ?>/css/individual.css?v=<?=$this->v?>" rel="stylesheet" type="text/css" />
+<link href="<?php echo Yii::app()->request->baseUrl; ?>/css/payment-page.css?v=<?=$this->v?>" rel="stylesheet" type="text/css" />
+
+<div id="home-mid" class="reg-form income-dashbord sticky-min-height2">
+ <?php if ( $payment == null || (isset($payment->status) && $payment->status != "VALID") ) : ?> 
+  <div class="payment-title" align="center"><h5><?=Yii::t('payment',"Please make a payment to Download your Income Tax Return in PDF")?> </h5></div>
+<?php endif; ?>
+<?php
+  if(Yii::app()->user->hasFlash('payment_success')) {
+?>
+    <br />
+    <div class="alert alert-success fade in"><a href="#" data-dismiss="alert" class="close">×</a>
+    <?=Yii::app()->user->getFlash('payment_success')?></div>
+<?php
+    } else if(Yii::app()->user->hasFlash('payment_error')) {
+?>
+    <br />
+    <div class="alert alert-danger fade in"><a href="#" data-dismiss="alert" class="close">×</a><?=Yii::app()->user->getFlash('payment_error')?></div>
+<?php
+    }
+?>
+<?php if ( $payment == null || (isset($payment->status) && $payment->status != "VALID") ) : ?>
+<div class="row">
+  <div class="col-lg-6">
+  
+    <div class="panel panel-default payment-details">
+      <div class="panel-heading">
+        <h3 class="panel-title text-left"> <?=Yii::t("payment","Payment Details")?> </h3>
+      </div>
+      <div class="panel-body">
+        <table class="price-table-style payment-page ">
+      <tbody>
+        <tr>
+            <td class="text-right-payment">
+              <span> 
+                <?=Yii::t('payment',"Plan:")?> 
+              </span>
+            </td>
+            <td class="text-left-payment">
+                   <b><?=Yii::t('payment',"Premier")?> </b>
+            </td>
+        </tr>
+        <tr>
+            <td  class="text-right-payment">
+              <span> 
+               <?=Yii::t('payment',"Plan Fee:")?> 
+              </span>
+            </td>
+            <td class="text-left-payment">
+                   <b><?=$serviceCharge?> <?=$this->currency?> </b> 
+            </td>
+        </tr>
+        <?php if ($voucher == null) : ?>
+          <!--
+          <td colspan="2" cl>
+              <div class="row" style="margin-left: 10px; padding-top: 5px;">
+                  <div class="col-md-offset-2">
+                      <div class="col-lg-6">
+                          <input type="text" id="giftVoucherCode" class="form-control" placeholder="Enter Discount Code Here "> 
+                      </div>
+                      <div class="col-lg-6 no-padding text-left-payment">
+                          <button type="button" class="btn btn-success btn-large" onClick="submitVoucherCode('null')"> <?=Yii::t("payment","Apply")?> </button>
+                      </div>
+                  </div>
+              </div>
+          </td>
+          -->
+        <?php endif; ?>
+        <?php if ($discount_text != "") :  ?>
+        <!--  
+        <tr>
+            <td class="text-right-payment">
+              <span> 
+                <?=Yii::t('payment',"Discount:")?> 
+              </span>
+            </td>
+            <td class="text-left-payment">
+            	 <b><?=$discount_text?></b> 
+            </td>
+        </tr>
+        -->
+        <?php endif; ?>
+        <tr>
+            <td  class="text-right-payment">
+              <span> 
+               <?=Yii::t('payment',"VAT")?> (<?=$tax?>%):
+              </span>
+            </td>
+            <td class="text-left-payment">
+                   <b><?=$tax_amount?> <?=$this->currency?></b> 
+            </td>
+        </tr>
+        
+        <tr>
+            <td  class="text-right-payment">
+            	<span> <?=Yii::t('payment',"")?> <?=Yii::t('payment',"Total Fee:")?></span>
+            </td>
+            <td class="text-left-payment">
+            	<b><?=$total_with_discount_tax?>
+            	<?=$this->currency?> </b>
+            </td>
+        </tr>
+ 
+      </tbody>
+    </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    
+    <div class="panel panel-default payment-details">
+      <div class="panel-heading">
+        <h3 class="panel-title"><?=Yii::t("payment", "Payment Method (Click on your payment button below)") ?></h3></h3>
+        
+      </div>
+      <div class="panel-body">
+      	<div class="lock-icon"><i class="fa fa-lock"></i></div>		
+        <label class="checkbox-inline">
+        <input value="1" name="t_and_c" id="t_and_c" type="checkbox"> By checking this button you are agreeing to our <a data-target="#agreeModal" data-toggle="modal" href="#">Terms and Conditions</a>
+      </label>
+      <div class="clearfix"></div>
+      <?php 
+        foreach ($options as $keys => $values) : 
+          if ($keys == "mobile") :
+      ?>
+        
+                     
+          <?php foreach ($values as $key => $value) : ?>    
+            <?php if (in_array(strtolower($value['name']), ["bkash"])) : ?>
+            
+            <div class="payment-methode-wrapping">
+              <?=$value['link']?></br>
+              <p style="text-align:center"><?=$value['name']?></p>
+            </div>
+
+            <?php endif; ?>
+    
+          <?php endforeach; ?>
+ 
+      <?php 
+          endif;
+        endforeach; 
+      ?>
+      
+<!-- THIS IS WITHOUT MOBILE PAYMENT -->              
+      <?php 
+        foreach ($options as $keys => $values) : 
+          if ($keys != "mobile") :
+      ?>
+        
+                     
+          <?php foreach ($values as $key => $value) : ?>    
+            <?php if (in_array(strtolower($value['name']), ["visa", "master", "amex"])) : ?>
+            
+            <div class="payment-methode-wrapping">
+              <?=$value['link']?></br>
+              <p style="text-align:center"><?=$value['name']?></p>
+            </div>
+
+            <?php endif; ?>
+    
+          <?php endforeach; ?>
+          <div class="clearfix"></div>
+ 
+      <?php 
+          endif;
+        endforeach; 
+      ?>
+	<div class="payment-message">
+      <?=Yii::t('payment',"Your payment will be processed by SSL Commerz. Please do not close the browser during payment processing. It may take upto 1 minute to process your payment.")?></div>
+      </div>
+    </div>
+  
+  </div>
+</div>
+<?php endif; ?>
+
+<div class="row">
+  <div class="col-lg-12">
+    <?php if ( $payment != null ) : ?>
+        <div class="panel panel-default payment-details-status">
+          <div class="panel-heading">
+            <h3 class="panel-title"><?=Yii::t("payment", "Payment Status") ?></h3>
+          </div>
+          <div class="panel-body">
+               <div class="table-responsive">
+                  <table class="table table-bordred table-striped">
+                    <tbody>
+                      <tr>
+                        <th>Status</th>
+                        <th><?=$payment->status?></th>
+                      </tr>
+                      <tr>
+                        <th>Transaction Date</th>
+                        <td><?=date("d/m/Y h:i A",strtotime($payment->tran_date))?></td>
+                      </tr>
+                      <tr>
+                        <th>Tax Year</th>
+                        <td><?=$payment->payment_year?></td>
+                      </tr>
+        
+                      <tr>
+                        <th>Transaction ID</th>
+                        <td><?=$payment->tran_id?></td>
+                      </tr>
+                      <tr>
+                        <th>Amount</th>
+                        <td><?=$payment->amount?></td>
+                      </tr>
+                      <tr>
+                        <th>Currency</th>
+                        <td><?=$payment->currency?></td>
+                      </tr>
+                      <tr>
+                        <th>Card Type</th>
+                        <td><?=$payment->card_type?></td>
+                      </tr>
+                      <tr>
+                        <th>Card Issuer</th>
+                        <td><?=$payment->card_issuer?></td>
+                      </tr>
+                      
+                      <tr>
+                        <th>Bank Transaction ID</th>
+                        <td><?=$payment->bank_tran_id?></td>
+                      </tr>
+                      
+                      <?php if ($payment->error != "") : ?>
+                      <tr>
+                        <th>Error</th>
+                        <td><?=$payment->error?></td>
+                      </tr>
+                      <?php endif; ?>
+                      
+                    </tbody>
+        
+                  </table>
+                </div>
+          </div>
+        </div>
+        
+
+    <?php endif; ?>
+  </div>
+</div>
+    
+
+
+</div>
+
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+    $('.payment-methode-wrapping a').attr('onclick','stopMoving(this)');
+    $('.payment-methode-wrapping a').click(function (e) {
+        e.preventDefault();
+    });
+
+  });
+
+  function stopMoving(d) {
+    if ( $("#t_and_c").prop('checked') == true ) {
+      window.location.href = d.href;
+    }
+    else {
+      bootbox.alert("Please accept Terms and Conditions to proceed.");
+    }
+  }
+  
+  function submitVoucherCode(id) {
+    $('#loading').css('display','block');
+    $("#showPaymentLink").html("");
+    $.ajax({
+      url : "<?=Yii::app()->baseUrl.'/index.php/Voucher/redeem'?>",
+      type : "POST",
+      dataType : "json",
+      cache : false,
+      data : { 
+        'id': id,
+        'code': $("#giftVoucherCode").val()
+      },
+      success : function(data) {
+        if (data.status == "success") {
+          bootbox.alert(data.msg, function(){
+            location.reload(true); 
+          });
+        }
+        else {
+          bootbox.alert(data.msg);
+        }
+      },
+      error : function(XMLHttpRequest, textStatus, errorThrown) {
+        bootbox.alert("Internal problem has been occurred. Please try again.");
+        $('#loading').css('display','none');
+      },
+      complete : function()
+      {
+        $('#loading').css('display','none');
+      }
+    });
+  }
+</script>
+
+
+
+

@@ -1,0 +1,32 @@
+		<?php
+return array(
+//STARTUP PAGE
+    "Ask a Question"=>'আপনার জিজ্ঞাসা',
+	"Let's get started"=>'আসুন শুরু করা যাক',
+	'YES'=>'হ্যাঁ',
+	'NO'=>'না',
+	'Next'=>'পরবর্তী',
+	'Previous'=>'পূর্ববর্তী',
+	'Store'=>'সংরক্ষণ করুন',
+    'You chose No. If you want to change your answer, please select from below.' => 'আপনি "না" সিলেক্ট করেছেন। আপনার সিদ্ধান্ত পরিবর্তন করতে চাইলে নিচে থেকে করুন ',
+    'Breakdown'=>'বিস্তারিত লিখুন',
+    'Review'=>'পুনর্বিবেচনা',
+	'No data found'=>'কোন তথ্য নেই পাওয়া যাই নাই',
+	'Successfully Stored'=>'সফলভাবে সঞ্চিত হয়েছে',
+	'Successfully Removed' => 'সফলভাবে সরানো হয়েছে',
+	'Successfully Set to No' => 'সফলভাবে না করা হয়েছে',
+    'Did you have any cash assets outside business'=>'আপনার ব্যবসা বহির্ভূত কোনো অর্থ  সম্পদ আছে',
+    'Refer A Friend'=>'বন্ধুকে পাঠান',
+    "Let's Get Started with Assets"=>'আসুন সম্পদ নিয়ে শুরু করা যাক',
+    "Let's Get Started with Liabilities"=>'আসুন দায় নিয়ে শুরু করা যাক',
+    "Let's Get Started with Expenses"=>'আসুন খরচ নিয়ে শুরু করা যাক',
+    "Let's Get Started with Final Review"=>'আসুন পুনর্বিবেচনা শুরু করা যাক',
+    "Let's Get Started with Income"=>'আসুন আয় নিয়ে শুরু করা যাক',
+    'Add More'=>'আরো যোগ করুন',
+    'From'=>'হইতে',
+    'To'=>'পর্যন্ত',
+    'Go'=>'অনুসন্ধান',
+    'OR'=>'অথবা',
+    'Create Account'=>'অথবা',
+	);
+?>

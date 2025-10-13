@@ -1,0 +1,25 @@
+#others{
+	width:32%;
+	float:left;
+	margin: 10px 0;
+}
+#internet{
+	width:35%;
+	float:left;
+	margin: 10px 0;
+}
+#mobile{
+	width:100%;
+	float:left;
+	margin: 10px 0;
+}
+#mobile img{
+	width:75%!important;
+	height:inherit!important;
+	
+}
+#cards{
+	width:32%;
+	float:left;
+	margin: 10px 0;
+}

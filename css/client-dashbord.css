@@ -1,0 +1,24 @@
+.client-dashbord-space{
+	margin:15px 0;
+}
+.number-of-client .panel-body{
+	line-height:388px;
+}
+.number-of-client p{
+	text-align:center;
+}
+.number-of-client a{
+	font-size:50px;
+	color:#3c763d;
+}
+.number-of-client a:hover{
+	color:#5cb85c;
+}
+.number-of-client-border-right{
+	border-right:1px solid #ccc;
+}
+.client-dashbord-space .panel-default>.panel-heading, .client-dashbord-space th{
+	color: #5cb85c!important;    
+	font-weight: bold;
+	
+}

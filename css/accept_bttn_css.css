@@ -1,0 +1,41 @@
+
+/* we accept style*/
+.we-accept{
+	margin: 30px 0px 0 5px ;
+}
+.we-accept p{
+	text-align:center; 
+	text-transform:uppercase; 
+	font-size:30px;  
+	padding-bottom:10px;
+	color:#404040;
+	font-family:"PTSans-Regular";
+	font-weight:bold;
+	background:#fff;
+	margin:auto;
+}
+
+.we-accept p::before,
+.we-accept p::after {
+    display: inline-block;
+    content: "";
+    border-top: .3rem solid #404040;
+    width: 4rem;
+    margin: 0 1rem;
+    transform: translateY(-1rem);
+}
+.we-accept ul{
+	width:41%;
+	margin:auto;	
+}
+
+.we-accept ul li{
+	list-style:none;
+	float:left;
+	margin:7px;
+	line-height: 60px;
+}
+.we-accept ul li img{
+	width:94px;
+}
+	

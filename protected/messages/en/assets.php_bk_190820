@@ -1,0 +1,10 @@
+<?php
+
+return array(
+	'Cash In Hand' => 'Cash In Hand (Notes and Currencies)',
+	'Cash At Bank' => 'Cash At Bank (Banks, cards and other electronic cash)',
+	'Other Deposits' => 'Other Deposits (Other deposits, balance and advance)',
+	'Other Fund'=>'Other Fund (Provident fund and other fund)',
+    'Other Funds'=>'Other Funds (Provident fund and other fund)',
+    'Prize Bond/Saving Scheme' => 'Prize Bond/Saving Scheme/FDR/DPS',
+);

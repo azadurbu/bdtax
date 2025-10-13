@@ -1,0 +1,208 @@
+<?php
+
+/**
+ * This is the model class for table "income_salaries".
+ *
+ * The followings are the available columns in table 'income_salaries':
+ * @property integer $IncomeSalariesId
+ * @property double $BasicPay
+ * @property double $SpecialPay
+ * @property double $DearnessAllowance
+ * @property double $ConveyanceAllowance
+ * @property double $HouseRentAllowance
+ * @property double $MedicalAllowance
+ * @property double $ServantAllowance
+ * @property double $LeaveAllowance
+ * @property double $HonorariumOrReward
+ * @property double $OvertimeAllowance
+ * @property double $Bonus
+ * @property double $OtherAllowances
+ * @property double $EmployersContributionProvidentFund
+ * @property double $RateOfInterest
+ * @property double $InterestAccruedProvidentFund
+ * @property double $DeemedIncomeTransport
+ * @property double $DeemedFreeAccommodation
+ * @property double $Others
+ * @property double $ConveyanceAllowance_1
+ * @property double $HouseRentAllowance_1
+ * @property double $MedicalAllowance_1
+ * @property double $InterestAccruedProvidentFund_1
+ * @property double $ConveyanceAllowance_2
+ * @property double $HouseRentAllowance_2
+ * @property double $MedicalAllowance_2
+ * @property double $InterestAccruedProvidentFund_2
+ * @property double $NetSalaryIncome
+ * @property double $NetTaxWaiver
+ * @property double $NetTaxableIncome
+ * @property integer $CPIId
+ * @property string $CreateAt
+ * @property string $LastvisitAt
+ * @property string $EntryYear
+ * @property integer $trash
+ * @property double $FestivalBonus
+ * @property double $BengaliNewYearBonus
+ * @property double $EntertainmentAllowance
+ * @property double $FestivalBonus_1
+ * @property double $BengaliNewYearBonus_1
+ * @property double $EntertainmentAllowance_1
+ * @property double $FestivalBonus_2
+ * @property double $BengaliNewYearBonus_2
+ * @property double $EntertainmentAllowance_2
+ * @property double $Arear
+ * @property double $Arear_1
+ * @property double $Arear_1
+ *
+ * The followings are the available model relations:
+ * @property Income[] $incomes
+ * @property PersonalInformation $cPI
+ */
+class IncomeSalaries extends CActiveRecord {
+
+	public $SumTaxableIncome;
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return IncomeSalaries the static model class
+	 */
+	public static function model($className = __CLASS__) {
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName() {
+		return 'income_salaries';
+	}
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules() {
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			// array('BasicPay, ConveyanceAllowance, HouseRentAllowance, MedicalAllowance, NetTaxableIncome, CPIId, EntryYear', 'required'),
+			array('BasicPay, NetTaxableIncome, CPIId, EntryYear', 'required'),
+			array('CPIId, trash', 'numerical', 'integerOnly' => true),
+			array('BasicPay, SpecialPay, DearnessAllowance, ConveyanceAllowance, HouseRentAllowance, MedicalAllowance, MedicalAllowanceForDisability, ServantAllowance, LeaveAllowance, HonorariumOrReward, OvertimeAllowance, Bonus, OtherAllowances, EmployersContributionProvidentFund, RateOfInterest, InterestAccruedProvidentFund, DeemedIncomeTransport, RentalValueOfHouse, PaidPartOfRentValue, DeemedFreeAccommodation, Others, NetTaxableIncome, FestivalBonus, BengaliNewYearBonus, EntertainmentAllowance, Gratuity, Gratuity_1, Gratuity_2, WorkersProfitParticipationFund, WorkersProfitParticipationFund_1, WorkersProfitParticipationFund_2,  Pension, Pension_1, Pension_2, RecognizedProvidentFundIncome, RecognizedProvidentFundIncome_1, RecognizedProvidentFundIncome_2, Surgery_HEKLC, Surgery_HEKLC_1, Surgery_HEKLC_2, Arear, Arear_1, Arear_2,', 'numerical'),
+			array('EntryYear', 'length', 'max' => 9),
+			array('DOB, LastvisitAt', 'safe'),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('IncomeSalariesId, BasicPay, SpecialPay, DearnessAllowance,SpecialPay_1, DearnessAllowance_1, ConveyanceAllowance, HouseRentAllowance, MedicalAllowance, MedicalAllowanceForDisability, ServantAllowance, LeaveAllowance, HonorariumOrReward, OvertimeAllowance, ServantAllowance_1, LeaveAllowance_1, HonorariumOrReward_1, OvertimeAllowance_1, Bonus, OtherAllowances, EmployersContributionProvidentFund, OtherAllowances_1, EmployersContributionProvidentFund_1, RateOfInterest, InterestAccruedProvidentFund, ReceivedAnyTransport, DeemedIncomeTransport, ReceivedAnyHouse, RentalValueOfHouse, PaidAnyPartOfRent, PaidPartOfRentValue,  DeemedFreeAccommodation, Others, DeemedIncomeTransport_1, DeemedFreeAccommodation_1, Others_1, ConveyanceAllowance_1, HouseRentAllowance_1, MedicalAllowance_1, MedicalAllowanceForDisability_1, InterestAccruedProvidentFund_1, ConveyanceAllowance_2, HouseRentAllowance_2, MedicalAllowance_2, MedicalAllowanceForDisability_2, InterestAccruedProvidentFund_2, NetSalaryIncome, NetTaxWaiver, NetTaxableIncome, CPIId, CreateAt, LastvisitAt, EntryYear, trash, FestivalBonus, BengaliNewYearBonus, EntertainmentAllowance, FestivalBonus_1, BengaliNewYearBonus_1, EntertainmentAllowance_1, FestivalBonus_2, BengaliNewYearBonus_2, EntertainmentAllowance_2, Gratuity, Gratuity_1, Gratuity_2, WorkersProfitParticipationFund, WorkersProfitParticipationFund_1, WorkersProfitParticipationFund_2, Pension, Pension_1, Pension_2, RecognizedProvidentFundIncome, RecognizedProvidentFundIncome_1, RecognizedProvidentFundIncome_2, Surgery_HEKLC, Surgery_HEKLC_1, Surgery_HEKLC_2, Arear, Arear_1, Arear_2,LeaveAllowance_2,LfaExempted, LeaveEncashment,LeaveEncashment_1,LeaveEncashment_2', 'safe'),
+			array('IncomeSalariesId, BasicPay, SpecialPay, DearnessAllowance, SpecialPay_1, DearnessAllowance_1, ConveyanceAllowance, HouseRentAllowance, MedicalAllowance, MedicalAllowanceForDisability, ServantAllowance, LeaveAllowance, HonorariumOrReward, OvertimeAllowance, ServantAllowance_1, LeaveAllowance_1, HonorariumOrReward_1, OvertimeAllowance_1, Bonus, OtherAllowances, EmployersContributionProvidentFund, OtherAllowances_1, EmployersContributionProvidentFund_1, RateOfInterest, InterestAccruedProvidentFund, ReceivedAnyTransport, DeemedIncomeTransport, ReceivedAnyHouse, RentalValueOfHouse, PaidAnyPartOfRent, PaidPartOfRentValue, DeemedFreeAccommodation, Others, DeemedIncomeTransport_1, DeemedFreeAccommodation_1, Others_1, NetTaxableIncome, CPIId, CreateAt, LastvisitAt, EntryYear, trash, FestivalBonus, BengaliNewYearBonus, EntertainmentAllowance, FestivalBonus_1, BengaliNewYearBonus_1, EntertainmentAllowance_1, FestivalBonus_2, BengaliNewYearBonus_2, EntertainmentAllowance_2, Gratuity, Gratuity_1, Gratuity_2, WorkersProfitParticipationFund, WorkersProfitParticipationFund_1, WorkersProfitParticipationFund_2, Pension, Pension_1, Pension_2, RecognizedProvidentFundIncome, RecognizedProvidentFundIncome_1, RecognizedProvidentFundIncome_2, Surgery_HEKLC, Surgery_HEKLC_1, Surgery_HEKLC_2, Arear, Arear_1, Arear_2,LeaveAllowance_2, LfaExempted, LeaveEncashment, LeaveEncashment_1, LeaveEncashment_2', 'safe', 'on' => 'search'),
+		);
+	}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations() {
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+			'incomes' => array(self::HAS_MANY, 'Income', 'IncomeSalariesId'),
+			'cPI' => array(self::BELONGS_TO, 'PersonalInformation', 'CPIId'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels() {
+		return array(
+			'IncomeSalariesId' => 'Income Salaries',
+			'BasicPay' => Yii::t('income', "Basic Pay"),
+			'SpecialPay' => Yii::t('income', "Special Pay"),
+			'DearnessAllowance' => Yii::t('income', 'Dearness Allowance'),
+			'ConveyanceAllowance' => Yii::t('income', 'Conveyance Allowance'),
+			'HouseRentAllowance' => Yii::t('income', 'House Rent Allowance'),
+			'MedicalAllowance' => Yii::t('income', 'Medical Allowance (without disability allowance)'),
+			'MedicalAllowanceForDisability' => Yii::t('income', 'Medical Allowance (disabled person)'),
+			'ServantAllowance' => Yii::t('income', 'Allowance for support staff'),
+			'LeaveAllowance' => Yii::t('income', 'Leave Fair Assistance (LFA)'),
+			'HonorariumOrReward' => Yii::t('income', 'Honorarium or Reward'),
+			'OvertimeAllowance' => Yii::t('income', 'Overtime Allowance'),
+			'Bonus' => Yii::t('income', 'Bonus'),
+			'OtherAllowances' => Yii::t('income', 'Other Allowances'),
+			'EmployersContributionProvidentFund' => Yii::t('income', 'Employers Contribution Provident Fund'),
+			'RateOfInterest' => Yii::t('income', 'Rate Of Interest'),
+			'InterestAccruedProvidentFund' => Yii::t('income', 'Interest Accrued Provident Fund'),
+			'ReceivedAnyTransport' => Yii::t('income', 'Have you received any transport from employer?'),
+			'DeemedIncomeTransport' => Yii::t('income', 'Deemed Income Transport'),
+			
+			'ReceivedAnyHouse' => Yii::t('income', 'Have you received any furnished or unfurnished house from employer?'),
+			'RentalValueOfHouse' => Yii::t('income', 'What is the rental value that your employer paid?'),
+			'PaidAnyPartOfRent' => Yii::t('income', 'Have you paid any part of the rent?'),
+			'PaidPartOfRentValue' => Yii::t('income', 'How much you have paid for rent?'),
+			'DeemedFreeAccommodation' => Yii::t('income', 'Deemed Free Accommodation'),
+			
+			'Others' => Yii::t('income', 'Others'),
+			'NetTaxableIncome' => Yii::t('income', 'Net Taxable Income'),
+			'CPIId' => 'Cpiid',
+			'DOB' => 'Dob',
+			'CreateAt' => 'Create At',
+			'LastvisitAt' => 'Lastvisit At',
+			'EntryYear' => 'Entry Year',
+			'trash' => 'Trash',
+			'FestivalBonus' => Yii::t('income', 'Festival Bonus'),
+			'BengaliNewYearBonus' => Yii::t('income', 'Bengali New Year Bonus'),
+			'EntertainmentAllowance' => Yii::t('income', 'Festival Allowance'),
+			'Gratuity' => Yii::t('income', 'Income received from Gratuity Fund'),
+			'WorkersProfitParticipationFund' => Yii::t('income', "Income From Workers Profit Participation Fund"),
+			'Pension' => Yii::t('income', 'Pension'),
+			'RecognizedProvidentFundIncome' => Yii::t('income', 'Income Received from Recognized Provident Fund and Recognized Super Annuation Fund'),
+			'Surgery_HEKLC' => Yii::t('income', 'Any amount received for surgery of heart,eye,liver,kidney,cancer'),
+			'Arear' => Yii::t('income', 'Arrear Pay (if not included in taxable income earlier)'),
+			'LeaveEncashment' => Yii::t('income', 'Leave Encashment'),
+		);
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function search() {
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
+
+		$criteria = new CDbCriteria;
+
+		$criteria->compare('IncomeSalariesId', $this->IncomeSalariesId);
+		$criteria->compare('BasicPay', $this->BasicPay);
+		$criteria->compare('SpecialPay', $this->SpecialPay);
+		$criteria->compare('DearnessAllowance', $this->DearnessAllowance);
+		$criteria->compare('ConveyanceAllowance', $this->ConveyanceAllowance);
+		$criteria->compare('HouseRentAllowance', $this->HouseRentAllowance);
+		$criteria->compare('MedicalAllowance', $this->MedicalAllowance);
+		$criteria->compare('MedicalAllowanceForDisability', $this->MedicalAllowanceForDisability);
+		$criteria->compare('ServantAllowance', $this->ServantAllowance);
+		$criteria->compare('LeaveAllowance', $this->LeaveAllowance);
+		$criteria->compare('HonorariumOrReward', $this->HonorariumOrReward);
+		$criteria->compare('OvertimeAllowance', $this->OvertimeAllowance);
+		$criteria->compare('Bonus', $this->Bonus);
+		$criteria->compare('OtherAllowances', $this->OtherAllowances);
+		$criteria->compare('RateOfInterest', $this->RateOfInterest);
+		$criteria->compare('EmployersContributionProvidentFund', $this->EmployersContributionProvidentFund);
+		$criteria->compare('InterestAccruedProvidentFund', $this->InterestAccruedProvidentFund);
+		$criteria->compare('DeemedIncomeTransport', $this->DeemedIncomeTransport);
+		$criteria->compare('DeemedFreeAccommodation', $this->DeemedFreeAccommodation);
+		$criteria->compare('Others', $this->Others);
+		$criteria->compare('NetTaxableIncome', $this->NetTaxableIncome);
+		$criteria->compare('CPIId', $this->CPIId);
+		$criteria->compare('DOB', $this->DOB, true);
+		$criteria->compare('CreateAt', $this->CreateAt, true);
+		$criteria->compare('LastvisitAt', $this->LastvisitAt, true);
+		$criteria->compare('EntryYear', $this->EntryYear, true);
+		$criteria->compare('trash', $this->trash);
+		$criteria->compare('FestivalBonus', $this->FestivalBonus);
+		$criteria->compare('BengaliNewYearBonus', $this->BengaliNewYearBonus);
+		$criteria->compare('EntertainmentAllowance', $this->EntertainmentAllowance);
+		$criteria->compare('LeaveEncashment', $this->LeaveEncashment);
+
+		return new CActiveDataProvider($this, array(
+			'criteria' => $criteria,
+		));
+	}
+}

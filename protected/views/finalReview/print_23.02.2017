@@ -1,0 +1,295 @@
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"/>
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.1.0/css/responsive.dataTables.min.css"/>
+  <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js"></script>
+    
+ <div id="fb-root"></div> 
+  <script>
+        (function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+</script>
+<?php
+$total = ($this->personalInformationStatusBar()+$this->incomeStatusBar()+$this->expenseStatusBar()+$this->assetsStatusBar()+$this->liabilityStatusBar())/5;
+?>
+<div id="home-mid" class="reg-form income-dashbord">
+  <div class="home_icon-box home_icon-7"></div>
+  <h4 style="color:#b90601; text-transform:uppercase; font-size:26px; font-weight:bold;"><?=Yii::t("liability", "Final Print") ?></h4>
+
+  <div class="clearfix"></div>
+
+<?php
+        if(Yii::app()->user->hasFlash('success')) {
+?>
+  <div class="alert alert-success fade in"><a href="#" data-dismiss="alert" class="close">×</a><h5><?=Yii::app()->user->getFlash('success')?></div>
+<?php
+  } else if(Yii::app()->user->hasFlash('error')) {
+?>
+  <div class="alert alert-danger fade in"><a href="#" data-dismiss="alert" class="close">×</a><h5><?=Yii::app()->user->getFlash('error')?></div>
+<?php
+  }
+?>
+
+<?php if($total == 100) : ?>
+  <p><?=Yii::t("liability", "Your all the steps have been completed. Now you can print your tax form from below.") ?></p>
+<?php else : ?>
+  <p style="color: #B90601">
+    <?=Yii::t("liability", "The whole process of your tax submission has not been completed yet.") ?>
+    <br/>
+    <?=Yii::t("liability", "Please complete all the steps before you download the Tax form.") ?>
+  </p>
+
+  
+  
+<?php endif; ?>
+<?php if($totalAdjustment>0){ ?>
+<p><br><?=Yii::t("liability", "You have to pay <strong>".$totalAdjustment.htmlentities(strip_tags($this->currency))."</strong> to the government. Please make a payorder<br/> in favor of Deputy Commissioner of Taxes, Circle - ". htmlentities(strip_tags(@$personal_info_model->TaxesCircle)).', Zone - '. htmlentities(strip_tags(@$personal_info_model->TaxesZone))) ?></p>
+  
+<?php }?>
+<br/>
+<div class="row">
+
+    <div class="col-lg-12" style="text-align: center;">
+
+      <a href="<?php echo Yii::app()->baseUrl; ?>/index.php/finalReview/viewPdf" target="_blank" class="btn btn-success"><b>Step 1:</b> <?=Yii::t("liability", "Download as PDF") ?></a>
+      &nbsp;&nbsp;&nbsp;
+      <a data-toggle="modal" data-target="#requiredDocuments" href="#" target="_blank" class="btn btn-success"><b>Step 2:</b> <?=Yii::t("liability", "Gather Required Documents") ?></a>
+      &nbsp;&nbsp;&nbsp;
+      <a data-toggle="modal" data-target="#nbrAddress" href="#" target="_blank" class="btn btn-success"><b>Step 3:</b> <?=Yii::t("liability", "Find your local NBR office") ?></a>
+    </div>
+  
+
+
+    <div class="clearfix"></div>
+</div>
+<br />
+<p><?=Yii::t("liability", "Thank you for using bdtax.com.bd. Please share your experience via facebook.") ?></p>
+
+
+
+<div style="width:250px; margin:auto; padding-top:25px; padding-right: 95px;">
+    <div style="text-align:center;" class="">
+      <div class="fb-share-button" data-href="https://bdtax.com.bd/" data-layout="button_count" style="padding-top:10px;"></div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+<?php if (Yii::app()->user->role == "customers") : ?>
+<!-- <div class="row">
+
+      <div class="col-lg-12" style="text-align: center; margin-top: 50px;">
+    <a class="btn btn-success" href="https://accounts.google.com/o/oauth2/auth?client_id=<?=$this->client_id?>&redirect_uri=<?=$this->redirect_uri?>&scope=https://www.google.com/m8/feeds/&response_type=code">Refer A Friend</a>
+  </div>
+</div> -->
+<?php endif; ?>
+
+
+
+
+
+
+</div>
+
+<!-- Modal - refer friend -->
+<div class="modal fade in" id="referFriendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title" id="myModalLabel2"><strong>Refer Friend</strong></h3>
+      </div>
+      <div class="modal-body">
+        
+        <div class="row">
+
+          <div class="col-lg-12">
+
+            <?php if ($referEmails != NULL) { ?>
+
+            <?php
+            $form = $this->beginWidget('UActiveForm', array(
+              'id' => 'refer-friend-form',
+              'enableAjaxValidation' => false,
+              'htmlOptions' => array('enctype' => 'multipart/form-data', 'class' => 'appnitro'),
+              ));
+              ?>
+
+              <div class="row">
+                <div class="col-lg-2">
+
+                </div>
+                <div class="col-lg-8">
+                  <div style="border: 1px solid black; max-height: 400px; min-height: 150px; overflow-y: scroll; margin-top: 20px;">
+                    <style>
+
+                      table#refer_friend td, table th {
+                        padding: 5px 3px !important; 
+                      }
+                      table#refer_friend {
+                        margin: 12px !important;
+                      }
+                    </style>
+                    <table id="refer_friend">
+                    <thead>
+                      <tr>
+                        <td><input type="checkbox" id="check_all" value="check_all"></td>
+                        <td>Check All</td>
+                      </tr>
+                    </thead>
+      <tbody>
+                      <?php foreach ($referEmails as $title) { ?>
+                      <tr>
+                        <td><input type="checkbox" class="email_address" name="email_address[]" value="<?=$title->attributes()->address?>"></td>
+                        <td><?=$title->attributes()->address?></td>
+                      </tr>
+
+                      <?php } ?>
+
+      <tbody>
+                    </table>
+
+                  </div>
+                  <div class="form-actions" style="padding-top: 10px;">
+                    <?php 
+                    if (!empty($referEmails)) {
+                      $this->widget('bootstrap.widgets.TbButton', array(
+                        'buttonType'=>'submit',
+                        'type'=>'success',
+                        'label'=> 'Refer Friend',
+                        'htmlOptions' => array(
+                          'name' => 'referFriendSubmit',
+                          ),
+                        )); 
+                    }
+                    ?>
+                    <?php $this->endWidget();?>
+                  </div>
+                </div>
+                <div class="col-lg-2">
+
+                </div>
+              </div>
+              <?php } ?>
+
+
+
+            </div>
+          </div>
+
+      </div>  
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal - end of refer friend -->
+
+<!-- Modal - requiredDocuments -->
+<div class="modal fade" id="requiredDocuments" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title" id="myModalLabel"><strong>Documents/Information to be submitted along with the return:</strong></h3>
+      </div>
+      <div class="modal-body">
+        <ol>
+          <li><strong>Salary:</strong><br>
+            Salary statement, Bank Statement/Certificate if Bank Account present or Interest income from bank, Proof for Investment allowances (e.g For Life Insurance policy proof of Premium Payment).</li>
+          <li><strong>Interest on Securities:</strong><br>
+        Photocopy of Bond/Debenture of the year when it was bought, If Interest income then approval from Interest Giving Authority, If Bond/Debenture is bought by Loan from Institution then Bank Statement/Certificate regarding payment of Interest or Approval Certificate from Institution.</li>
+          <li><strong>From House Property:</strong><br>
+            Rental Agreement supporting the House Rent or Copy of slip for Rent, Monthly Statement of Rent Received, Bank Statement of the Account in which Rent received, Copy of slip supporting payment of Municipal Tax Land Tax City Corporation Tax, If house bought/constructed on loan from bank then bank statement supporting interest payment, Copy for premium payment for insurance of house property.</li>
+          <li><strong>Business or Profession:</strong><br>
+        Income statement and Balance sheet of Business/Profession.</li>
+          <li><strong>Profit from Partnership Firm:</strong><br>
+          Income statement and Balance sheet of Firm.</li>
+          <li><strong>Capital Gains:</strong><br>
+          Copy of deed for sale of immovable property, Photocopy of challan/pay order if any TDS, Documents supporting profit from transactions of share of company listed in stock exchange.</li>
+          <li><strong>Other Sources:</strong><br>
+          If any cash dividend then bank statement and copy of dividend warrant/certificate, Copy of certificate at the time of interest income or encashment of saving instruments, Bank statement/certificate if interest income from bank, Documents related to any other income.</li>
+          <li><strong>Proof of TDS:</strong><br>
+            Copy of challan of tax payment, pay order/bank draft/account payee cheque (up to 10,000 payment can be done through treasury challan.above this payment must be done through pay order/bank draft/account payee cheque), Certificate from TDS authority if any TDS.</li>
+        </ol>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal - nbrAddress -->
+<div class="modal fade" id="nbrAddress" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title" id="myModalLabel"><strong>NBR Local Office Details:</strong></h3>
+      </div>
+      <div class="modal-body">
+        <div class="text-center">
+          <img width="858px" src="<?php echo Yii::app()->request->baseUrl; ?>/images/nbr_contacts.png" />
+        </div>
+      </div>  
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<?php
+
+
+?>
+<style type="text/css">
+iframe
+  {
+  transform: scale(2);
+  -ms-transform: scale(2); 
+  -webkit-transform: scale(2); 
+  -o-transform: scale(2); 
+  -moz-transform: scale(2); 
+  transform-origin: top left;
+  -ms-transform-origin: top left;
+  -webkit-transform-origin: top left;
+  -moz-transform-origin: top left;
+  -webkit-transform-origin: top left;
+  }
+</style>
+
+<script>
+$(document).ready(function() {
+  $("#check_all").click(function() {
+    if ($(this).prop('checked')==true){ 
+            $('.email_address').prop('checked', true);
+        }
+        else {
+          $('.email_address').prop('checked', false);
+        }
+  });
+
+    if ($("#check_all").length != 0) {
+        $('#referFriendModal').modal('show');
+    }
+    
+    $('#refer_friend').DataTable({
+      "paging":   false,
+          "ordering": false,
+          "info":     false,
+          "fixedHeader": true
+    });
+
+});
+</script>

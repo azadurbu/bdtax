@@ -1,0 +1,330 @@
+<table width="100%" border="1" cellspacing="0" cellpadding="0">
+	<tbody>
+		<tr>
+			<td colspan="2" width="44%" style="padding:0px 10px; border-top:1px solid #fff;border-right:1px solid #fff;border-left:1px solid #fff;">
+				<p>Particulars</p>
+			</td>
+			<td width="18%" style="padding:0px 10px;border-top:1px solid #fff;border-right:1px solid #fff;border-left:1px solid #fff; text-align:center;">
+				<p>Amount</p>
+				<p style="font-weight:normal;">(A)</p>
+			</td>
+			<td width="18%" style="padding:0px 10px;border-top:1px solid #fff;border-right:1px solid #fff;border-left:1px solid #fff; text-align:center;">
+				<p>Tax exempted</p>
+                <p style="font-weight:normal;">(B)</p>
+			</td>
+			<td width="18%" style="padding:0px 10px;border-top:1px solid #fff;border-right:1px solid #fff;border-left:1px solid #fff; text-align:center;">
+				<p>Taxable</p>
+				<p style="font-weight:normal;">(C = A-B)</p>
+			</td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>03</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Basic pay</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->BasicPay; ?></td>
+			<td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->BasicPay; ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>04</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Special pay</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->SpecialPay; ?></td>
+      <td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->SpecialPay; ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>05</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Arrear pay (if not included in taxable income earlier)</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Arear; ?></td>
+			<td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Arear; ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>06</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Dearness allowance</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->DearnessAllowance ?></td>
+      <td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->DearnessAllowance ?></td>
+    </tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>07</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>House rent allowance</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->HouseRentAllowance_1; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->HouseRentAllowance_2; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->HouseRentAllowance; ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>08</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Medical allowance</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->MedicalAllowance_1; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->MedicalAllowance_2; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->MedicalAllowance; ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>09</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Conveyance allowance</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->ConveyanceAllowance_1; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->ConveyanceAllowance_2; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->ConveyanceAllowance; ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>10</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Festival Allowance</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;">&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;">&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>11</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Allowance for support staff</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->ServantAllowance ?></td>
+			<td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->ServantAllowance ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>12</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Leave allowance</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->LeaveAllowance_1 ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->LeaveAllowance_2 ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->LeaveAllowance ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>13</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Leave Encashment</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->LeaveEncashment_1 ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->LeaveEncashment_2 ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->LeaveEncashment ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>14</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Honorarium/ Reward/Fee</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->HonorariumOrReward ?></td>
+			<td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->HonorariumOrReward ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>15</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Overtime allowance</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->OvertimeAllowance ?></td>
+			<td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->OvertimeAllowance ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>16</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Bonus / Ex-gratia</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Bonus ?></td>
+			<td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Bonus ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>17</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Other allowances</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->OtherAllowances ?></td>
+			<td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->OtherAllowances ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>18</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Employer&rsquo;s contribution to a recognized provident fund</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->EmployersContributionProvidentFund ?></td>
+			<td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->EmployersContributionProvidentFund ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>19</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Interest accrued on a recognized provident fund</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->InterestAccruedProvidentFund_1; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->InterestAccruedProvidentFund_2; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->InterestAccruedProvidentFund; ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>20</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Deemed income for transport facility</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->DeemedIncomeTransport; ?></td>
+			<td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->DeemedIncomeTransport; ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>21</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Deemed income for free furnished/ unfurnished accommodation</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->DeemedFreeAccommodation; ?></td>
+			<td width="18%" style="padding:5px 10px;">0&nbsp;</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->DeemedFreeAccommodation; ?></td>
+		</tr>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>22</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Other</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Others; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo 0; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Others?></td>
+		</tr>
+		<?php if(@$income_salaries_model->MedicalAllowanceForDisability_1>0){ ?>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p></p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Other (Medical allowance for disabled person)</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->MedicalAllowanceForDisability_1; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->MedicalAllowanceForDisability_2; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->MedicalAllowanceForDisability; ?></td>
+		</tr>
+		<?php }?>
+		<?php if(@$income_salaries_model->Surgery_HEKLC_1>0){ ?>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p></p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Other (Amount received for surgery of heart,eye,liver,kidney,cancer)</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Surgery_HEKLC_1; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Surgery_HEKLC_2; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Surgery_HEKLC; ?></td>
+		</tr>
+		<?php }?>
+		<?php if(@$income_salaries_model->Gratuity_1>0){ ?>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p></p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Other (Gratuity Income)</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Gratuity_1; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Gratuity_2; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Gratuity; ?></td>
+		</tr>
+		<?php }?>
+		<?php if(@$income_salaries_model->WorkersProfitParticipationFund_1>0){ ?>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p></p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Other (Income From Workers Profit Participation Fund)</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->WorkersProfitParticipationFund_1; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->WorkersProfitParticipationFund_2; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->WorkersProfitParticipationFund; ?></td>
+		</tr>
+		<?php }?>
+		<?php if(@$income_salaries_model->Pension_1>0){ ?>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p></p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Other (Pension)</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Pension_1; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Pension_2; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->Pension; ?></td>
+		</tr>
+		<?php }?>
+		<?php if(@$income_salaries_model->RecognizedProvidentFundIncome_1>0){ ?>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p></p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Other (Income Received from Recognized Provident Fund and Recognized Super Annuation Fund)</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->RecognizedProvidentFundIncome_1; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->RecognizedProvidentFundIncome_2; ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->RecognizedProvidentFundIncome; ?></td>
+		</tr>
+		<?php }?>
+		<tr>
+			<td width="5%" style="padding:5px 10px;">
+				<p>23</p>
+			</td>
+			<td width="39%" style="padding:5px 10px;">
+				<p>Total</p>
+			</td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->NetSalaryIncome ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->NetTaxWaiver ?></td>
+			<td width="18%" style="padding:5px 10px;"><?php echo @$income_salaries_model->NetTaxableIncome ?></td>
+		</tr>
+	</tbody>
+</table>

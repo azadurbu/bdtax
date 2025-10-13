@@ -1,0 +1,35 @@
+<?php
+
+return array(
+	'Home'=>'হোম',
+	'About'=>'আমাদের সম্পর্কে',
+	'Contact'=>'যোগাযোগ',
+	'Sign in'=>'প্রবেশ কর',
+	'Pricing'=>'মূল্য',
+	'Email address'=>'ই-মেইল ঠিকানা',
+	'Your E-mail....'=>'আপনার ই-মেইল....',
+	'Password'=>'পাসওয়ার্ড',
+	'Password....'=>'পাসওয়ার্ড ....',
+	'Remember me'=>'আমাকে মনে রাখ',
+	'Register Now'=>'নিবন্ধন করুন',
+	'Ready to start your tax return?'=>'ট্যাক্স প্রদান শুরু করার জন্য আপনি কি প্রস্তুত?',
+	'Start For Free'=>'বিনামূল্যে শুরু করুন ',
+	'About Us'=>'আমাদের সম্পর্কে',
+	'bdtax.com.bd is first online tax preparation, processing and submission software for Bangladesh. With bdtax.com.bd you can easily prepare your tax, electronically file with National Bureau of Revenue (NBR) and pay any tax due with a mobile payment, credit card or bank transfers. It is a system guided easy-to-use tax preparation software will save you time, money and help reduce any tax potential audits by the Government. Give it a try today. Start your tax filing for'=>'বিডিট্যাক্স.কম.বিডি প্রথম অনলাইন কর প্রস্তুতি, প্রক্রিয়াকরণ এবং বাংলাদেশের জন্য জমা সফ্টওয়্যার. বিডিট্যাক্স.কম.বিডি দিয়ে আপনি সহজে ইলেক্ট্রনিকাল্লি, আপনার ট্যাক্স প্রস্তুত করতে পারেন রাজস্ব (এনবিআর) ন্যাশনাল ব্যুরো সঙ্গে ফাইল এবং কারণে একটি মোবাইল পেমেন্ট, ক্রেডিট কার্ড বা ব্যাংক স্থানান্তর সঙ্গে কোনো কর দিতে. এটি \'গুলি সিস্টেম নির্দেশিত সহজ-থেকে-ব্যবহার কর প্রস্তুতি সফ্টওয়্যার আপনি সময়, অর্থ সংরক্ষণ এবং সরকার কর্তৃক কোনো ট্যাক্স সম্ভাব্য অডিট কমাতে সাহায্য করবে. আজ এটি ব্যবহার করে দেখুন. \'জন্য আপনার ট্যাক্স ফাইলিং শুরু করুন',
+	'FREE'=>'বিনামূল্যে',
+	'Helpful Links'=>'সাহা্য্যকারী লিংক',
+	'National Board of Revenue (NBR)'=>'রাজস্ব (এনবিআর) ন্যাশনাল বোর্ড',
+	'e-TIN Registration'=>'ই-টিআইএন রেজিস্ট্রেশন',
+	'NBR Tax Calculator'=>'এনবিআর ট্যাক্স ক্যালকুলেটর',
+	'Contact Us'=>'যোগাযোগ করুন',
+	'Name'=>'নাম',
+	'Enter email'=>'ইমেইল প্রদান করুন',
+	'Message'=>'বার্তা',
+	'SEND MESSAGE'=>'বার্তা পাঠাও',
+	'&copy; 2015 bdtax.com.bd All Rights Reserved.'=>'&copy; ২০১৫ বিডিট্যাক্স.কম.বিডি সর্বসত্ত্ব সংরক্ষিত.',
+	//contact us page//
+	'Help'=>'হেল্প',
+	'Please enter the letters as they are shown in the image above.Letters are not case-sensitive.'=>'উপরের ছবিতে দেখানো আছে তেমনভাবে অক্ষরগুলি লিখুন.অক্ষরগুলির কেস-সেনসেটিভ নয়.',
+	'Our system has been audited by M L H Chowdhury &amp; Co. Chartered Accountants'=>'আমাদের পদ্ধতি এম এল এইচ চৌধুরী এবং কো চার্টেড একাউন্টেন্টস দ্বারা নিরীক্ষিত হয়েছ',
+
+	);

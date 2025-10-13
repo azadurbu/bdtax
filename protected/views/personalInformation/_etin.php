@@ -1,0 +1,828 @@
+<link href="<?php echo Yii::app()->request->baseUrl; ?>/css/datepicker.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo Yii::app()->request->baseUrl; ?>/css/custom.css?v=<?=$this->v?>" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.1.0/css/responsive.dataTables.min.css"/>
+<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="<?php echo Yii::app()->baseUrl ?>/js/input_mask.js"></script>
+<script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js"></script>
+
+<script type="text/javascript">
+	$(function() {
+		$('.nav-tabs-sticky-pi').stickyTabs();
+
+		$("#PersonalInformation_ETIN").mask("9999999999?99");
+		$("#PersonalInformation_SpouseETIN").mask("999999999999");
+
+	});
+</script>
+
+<script type="text/javascript">
+function isNumberKey(evt){
+    var charCode = (evt.which) ? evt.which : event.keyCode
+    if (charCode > 31 && (charCode < 48 || charCode > 57))
+        return false;
+    return true;
+}    
+</script>
+
+
+<?php
+$this->breadcrumbs = array(
+	'Personal Information' => array('../index.php/PersonalInformation'),
+	'Income' => array('../index.php/income'),
+	'Asset' => array('../index.php/asset'),
+	'Expenditure' => array('../index.php/expenditure'),
+	'Personal Information Entry',
+);
+?>
+
+
+<?php
+	$form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+		'id' => 'personal-information-form',
+		'enableAjaxValidation' => false,
+	));
+?>
+
+
+
+
+		<!-- ################-----------START---------TAB-----------------------################ -->
+<!-- FLASH MESSAGE -->
+<div class="flash_alert">
+  <?php if(Yii::app()->user->hasFlash('alert_success')) : ?>
+    <div class="alert alert-success alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <?=Yii::app()->user->getFlash('alert_success')?>
+    </div>
+  <?php endif; ?>
+</div>
+<!-- END - FLASH MESSAGE -->
+
+		<div class="reg-form income-dashbord nav-tabs-sticky-pi margin_bottom sticky-min-height">
+			<div role="tabpanel" id="liabilities_tab">
+				<!-- Nav tabs -->
+				<ul class="nav nav-tabs" role="tablist" id="myTab">
+					<li role="presentation" class="active" id="etinTab"><a href="#etin" role="tab" data-toggle="tab" title="<?=Yii::t('TTips', "2.1")?>"><?php echo ($model->ETIN == '') ? '' : '<i class="fa fa-check-square"></i>'; ?> <?=Yii::t('p_info', "E-TIN")?></a></li>
+
+					<li role="presentation" id="knowMeTab"><a href="#PIDetails-1" role="tab" data-toggle="tab" title="<?=Yii::t('TTips', "2.2")?>"><?php echo ($model->Name != '' || $model->DOB != '' || $model->Status != '' || $model->SpouseName != '' || $model->SpouseETIN != '' || $model->Gender != '') ? '<i class="fa fa-check-square"></i>' : ''; ?> <?=Yii::t('p_info', "Personal Information")?> </a></li>
+
+					<li role="presentation" id="aboutLifeTab"><a href="#PIDetails-2" role="tab" data-toggle="tab" title="<?=Yii::t('TTips', "2.3")?>"><?php echo ($model->Disability != '' || $model->FathersName != '' || $model->MothersName != '' || $model->EmployerName != '' || $model->EmployerAddress != '' || $model->DivisionId != '' || $model->DistrictId != '' || $model->Area != '' || $model->SectorBlock != '' || $model->Road != '' || $model->House != '' || $model->ZipCode != '' || $model->PresentAddress != '' || $model->PermanentAddress != '') ? '<i class="fa fa-check-square"></i>' : ''; ?> <?=Yii::t('p_info', "Additional Personal Information")?> </a></li>
+					
+
+					<!-- <li role="presentation" id=""><a data-toggle="modal" data-target="#requiredDocuments" href="#" target="_blank"><?=Yii::t("p_info", "Gather Required Documents") ?></a></li>
+ -->
+					<li role="presentation"><a href="#myDocs" role="tab" data-toggle="tab" title=""> <?=Yii::t('user', "My Documents")?> </a></li>
+
+				</ul>
+				<!-- Tab panes -->
+				<div class="tab-content">
+					<div class="back pull-right">
+						<a class="btn btn-success for-clr" href="<?=Yii::app()->baseUrl?>/index.php/personalInformation/review" ><span class="previous-text"> <?=Yii::t('common', "Review")?> </span><i class="glyphicon glyphicon-list-alt"></i></a>
+					</div>
+					<!-- #################-------------ETIN--------START----------################ -->
+					<div role="tabpanel" class="tab-pane active" id="etin">
+						<div class="home_icon-box home_icon-1"></div>
+						<h2> <?=Yii::t('p_info', "Please enter your e-TIN")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.1")?>"></i></h2>
+						<div class="mail-box">
+							<!--<div id="PersonalInformation_ETIN_error"></div> -->
+							<div class="input-group margin-bottom-sm">
+								<span class="input-group-addon"> </span>
+								<?php
+								if(isset($payments) && $payments == 1){
+									echo $form->textField($model, 'ETIN', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "E-TIN Number"), 'readonly'=>'true', 'style'=>'cursor:pointer')); 
+								}else{
+									echo $form->textField($model, 'ETIN', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "E-TIN Number"))); 
+								}
+								?>
+								<?php echo $form->error($model, 'ETIN'); ?>
+							</div>
+							<p class="text_left" style="padding-top:10px;"><?=Yii::t('p_info', "Don't you have your E-TIN")?>?
+								<a href="http://secure.incometax.gov.bd/TINHome" target="_blank"> <?=Yii::t('p_info', "Click here")?>. </a>
+							</p>
+                            
+							<p class="button-padding">
+								<button class="btn btn-success btn-lg" id="etin_btn" type="button"><?=Yii::t('p_info', "Save & Continue")?></button>
+							</p>
+						</div>
+
+						<div class="login-button input-group">
+							<div class="back pull-right">
+								<!-- <a class="btn btn-success for-clr" href="#PIDetails-1" data-toggle="tab" id="knowMe_btn"><span class="previous-text"> <?=Yii::t('p_info', "Next")?> </span> <i class="fa fa-chevron-right"></i></a> -->
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</div>
+					<!-- ######################----------ETIN-----END--------------------############## -->
+					<!-- ######################------------------PIDetails-1-----START---############## -->
+
+					<div role="tabpanel" class="tab-pane" id="PIDetails-1">
+						<form id="PIDetails_single-1">
+
+							<div class="home_icon-box home_icon-1"></div>
+							<h2><?=Yii::t('p_info', "Personal Information")?>  &nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.2")?>"></i></h2>
+							<div class="clearfix"></div>
+
+							<div class="mail-box">
+								<h3><?=Yii::t('p_info', "Please enter your full name")?><span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.4")?>"></i></h3>
+
+								<div id="PersonalInformation_Name_error"></div>
+								<div class="input-group margin-bottom-sm">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<input onkeyup="validate(id);" id="PersonalInformation_FullName" name="PersonalInformation[Name]" type="text" value="<?php echo @$model->Name; ?>" class="form-control">
+								</div>
+							</div>
+							<div class="mail-box">
+								<h3><?=Yii::t('p_info', "Please enter your date of birth")?><span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.5")?>"></i></h3>
+								<div id="PersonalInformation_dob_error"></div>
+							</div>
+							<div class="mail-box">
+								<div class="input-group margin-bottom-sm">
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+									<?php 
+									$dateofBirth = '';
+									if($model->DOB != '') {
+										$dateofBirth = date('d-m-Y', strtotime($model->DOB));
+									}
+									
+									echo $form->textField($model, 'DOB', array('value' => $dateofBirth, 'class' => 'form-control', 'placeholder' =>  Yii::t('p_info', "Date of Birth")));
+									?>
+								</div>
+							</div>
+
+							<!-- <p class="p_color">Thanks and incase you were wondaring</p> -->
+							<div class="mail-box">
+								<h3><?=Yii::t('p_info', "Please enter your marital status")?><span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.6")?>"></i></h3>
+								<div id="PersonalInformation_status_error"></div>
+								<div class="row form-group product-chooser" id="content-middle" style="width:100%">
+									<div class="col-lg-6">
+										<div class="product-chooser-item <?php echo ($model->Status == 'Single' ? 'selected' : ''); ?>" data-title="single" >
+											<div class="user_1"></div>
+										</div>
+									</div>
+									<div class="col-lg-6">
+										<div class="product-chooser-item <?php echo ($model->Status == 'Married' ? 'selected' : ''); ?>" data-title="Married" >
+											<div class="user_2"></div>
+										</div>
+									</div>
+									<?php echo $form->hiddenField($model, 'Status', array('value' => @$model->Status, 'id' => 'Mstatus')); ?>
+									<?php echo $form->hiddenField($model, 'CPIId', array('value' => @$model->CPIId, 'id' => 'CPIId')); ?>
+								</div>
+								<div id="text-middle">
+									<div class="col-md-6"><h5><?=Yii::t('p_info', "Single")?></h5></div>
+									<div class="col-md-6"><h5><?=Yii::t('p_info', "Married")?></h5></div>
+									<div class="clearfix"></div>
+								</div>
+							</div>
+							<div class="mail-box">
+								<div id="spouseSection" class="<?=($model->Status == 'Married' ? 'show' : 'hide');?>">
+									<div id="PersonalInformation_spouseName_error"></div>
+									<h3><?=Yii::t('p_info', "Please enter your spouse's name")?><span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.7")?>"></i></h3>
+
+									<?php echo $form->textField($model, 'SpouseName', array('class' => 'form-control', 'placeholder' => '', "onkeyup" => "validate(id);")); ?>
+
+
+
+									<h3><?=Yii::t('p_info', "Your spouse's E-TIN")?> #&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.8")?>"></i></h3>
+
+									<?php echo $form->textField($model, 'SpouseETIN', array('class' => 'form-control', 'placeholder' => '')); ?>
+
+									<h3><?=Yii::t('p_info', "Is any of your children disabled?")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.12")?>"></i></h3>
+
+									<div class="info">
+										<p>
+											<label>
+												<?php echo $form->radioButton($model, 'AnyDisabledChild', array('value' => 'Y', 'uncheckValue' => '','class'=>'AnyDisabledChild')); ?>
+												<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "YES")?></span>
+											</label>
+											<label style="margin-left:10px">
+												<?php echo $form->radioButton($model, 'AnyDisabledChild', array('value' => 'N', 'uncheckValue' => '','class'=>'AnyDisabledChild')); ?>
+												<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "NO")?></span>
+											</label>
+										</p>
+									</div>
+
+									<h3 class="sub_section" <?php echo ($model->AnyDisabledChild == 'Y') ? '' : 'style="display:none;"'; ?> ><?=Yii::t('p_info', "Has your spouse availed the exemption for disable child?")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.12")?>"></i></h3>
+
+									<div class="info sub_section" <?php echo ($model->AnyDisabledChild == 'Y') ? '' : 'style="display:none;"'; ?> >
+										<p>
+											<label>
+												<?php echo $form->radioButton($model, 'AvailChildDisabilityExemp', array('value' => 'Y', 'uncheckValue' => '')); ?>
+												<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "YES")?></span>
+											</label>
+											<label style="margin-left:10px">
+												<?php echo $form->radioButton($model, 'AvailChildDisabilityExemp', array('value' => 'N', 'uncheckValue' => '')); ?>
+												<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "NO")?></span>
+											</label>
+										</p>
+									</div>
+
+								</div>
+							</div>
+							<div class="mail-box">
+								<h3><?=Yii::t('p_info', "Your gender")?>?<span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.9")?>"></i></h3>
+								<div id="PersonalInformation_gender_error"></div>
+
+								<div class="info">
+									<p>
+										<label>
+											<?php echo $form->radioButton($model, 'Gender', array('value' => 'Male', 'uncheckValue' => '')); ?>
+											<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "Male")?></span>
+										</label>
+										<label style="margin-left:10px">
+											<?php echo $form->radioButton($model, 'Gender', array('value' => 'Female', 'uncheckValue' => '')); ?>
+											<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "Female")?></span>
+										</label>
+									</p>
+								</div>
+							</div>
+
+							<div class="mail-box">
+								<h3><?=Yii::t('p_info', "Your residential status")?>?<span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.10")?>"></i></h3>
+								<div id="PersonalInformation_residentialStatus_error"></div>
+								<div class="info">
+									<?php 
+									if ($model->ResidentialStatus == '') {
+										$model->ResidentialStatus = 'Y';
+									}
+									?>
+									<p>
+										<label>
+											<?php echo $form->radioButton($model, 'ResidentialStatus', array('value' => 'N', 'uncheckValue' => null)); ?>
+											<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "Non-resident")?></span>
+										</label>
+										<label style="margin-left:10px">
+											<?php echo $form->radioButton($model, 'ResidentialStatus', array('value' => 'Y', 'uncheckValue' => null)); ?>
+											<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "Resident")?></span>
+										</label>
+									</p>
+								</div>
+							</div>
+
+							<div class="mail-box">
+								<h3><?=Yii::t('p_info', "Your National ID")?> #?&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.11")?>"></i></h3>
+								<?php echo $form->textField($model, 'NationalId', array('class' => 'form-control int_field', 'placeholder' => Yii::t('p_info', "National ID"), 'maxlength' => '17')); ?>
+							</div>
+							
+							<div class="mail-box">
+								<div id="PersonalInformation_success1"></div>
+							</div>
+							<p class="button-padding">
+								<button class="btn btn-success btn-lg" type="button" id="PIDetails-1_btn"><?=Yii::t('p_info', "Save & Continue")?></button>
+							</p>
+
+							<div class="login-button input-group">
+								<div class="back pull-left">
+									<a class="btn btn-success for-clr" data-toggle="tab" href="#etin"  id="name_btn"> <i class="fa fa-chevron-left"></i><span class="previous-text"> <?=Yii::t('common', "Previous")?></span></a>
+								</div>
+								<div class="back pull-right">
+									<!-- <a class="btn btn-success for-clr" data-toggle="tab" href="#PIDetails-2"  id="aboutLife_btn" ><span class="previous-text"> <?=Yii::t('p_info', "Next")?> </span> <i class="fa fa-chevron-right"></i></a> -->
+								</div>
+								<div class="clearfix"></div>
+							</div>
+
+							<div class="clearfix"></div>
+						</form>
+						<div class="clearfix"></div>
+					</div>
+					<!-- #######################----------PIDetails-1--------END----------########### -->
+					<!-- ###############------------------PIDetails-2--------START--------########### -->
+
+					<div role="tabpanel" class="tab-pane" id="PIDetails-2">
+						<div class="home_icon-box home_icon-1"></div>
+						<h2> <?=Yii::t('p_info', "Additional Personal Information")?> &nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.3")?>"></i></h2>
+						<!-- <p>Now talk a bit about your life</p>  -->
+
+						<h3><?=Yii::t('p_info', "Do you have any kind of disability")?>?<span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.12")?>"></i></h3>
+
+						<form id="PIDetailsForm-2">
+							<div class="col-lg-12">
+								<div class='col-lg-offset-4 col-lg-4' id="disability_error"></div>
+							</div>
+							<div id="PersonalInformation_details2_error"></div>
+							<div class="info">
+								<p>
+									<label>
+										<?php echo $form->radioButton($model, 'Disability', array('value' => 'NO', 'uncheckValue' => null)); ?>
+										<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "NO")?></span>
+									</label>
+									<label style="margin-left:10px">
+										<?php echo $form->radioButton($model, 'Disability', array('value' => 'YES', 'uncheckValue' => null)); ?>
+										<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "YES")?></span>
+									</label>
+								</p>
+							</div>
+							
+
+							<?php echo $form->hiddenField($model, 'CPIId', array('value' => @$model->CPIId, 'id' => 'CPIId')); ?>
+
+							<div class="mail-box">
+								<div class="col-lg-12">
+									<h3><?=Yii::t('p_info', "Please enter your father's name")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.14")?>"></i></h3>
+									<div id="PersonalInformation_fathersName_error"></div>
+									<?php echo $form->textField($model, 'FathersName', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "Father's Name"), "onkeyup" => "validate(id);")); ?>
+								</div>
+							</div>
+						
+							<div class="mail-box">
+								<div class="col-lg-12">
+									<h3><?=Yii::t('p_info', "Please enter your mother's name")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.15")?>"></i></h3>
+									<div id="PersonalInformation_mothersName_error"></div>
+									<?php echo $form->textField($model, 'MothersName', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "Mother's Name"), "onkeyup" => "validate(id);")); ?>
+								</div>
+							</div>
+<div class="clearfix"></div>
+					
+
+							<div class="mail-box">
+								<div class="clearfix"></div>
+								
+
+									<h3><?=Yii::t('p_info', "Number of dependant children of the family")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.21")?>"></i></h3>
+
+									<div id="PersonalInformation_NoOfAdultInFamily_error"></div>
+									<div class="col-lg-6">
+										<?php echo $form->numberField($model, 'NoOfAdultInFamily', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "Number of Adult"), "min" => "0", "max" => "10", 'onkeypress' => 'return isNumberKey(event)')); ?>
+									</div>
+									<div class="col-lg-6">
+										<?php echo $form->numberField($model, 'NoOfChildInFamily', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "Number of Children"), "min" => "0", "max" => "10", 'onkeypress' => 'return isNumberKey(event)')); ?>
+									</div>
+								
+							</div>
+							<br>
+							<div class="clearfix"></div>
+						
+
+							<h3><?=Yii::t('p_info', "Are you a gazetted war wounded freedom fighter")?>?<span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.13")?>"></i></h3>
+							<div class="col-lg-12">
+								<div class='col-lg-offset-4 col-lg-4' id="freedomFighter_error"></div>
+							</div>
+							<div class="info">
+								<p>
+									<label>
+										<?php echo $form->radioButton($model, 'FreedomFighter', array('value' => 'N', 'uncheckValue' => null)); ?>
+										<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "NO")?> </span>
+									</label>
+									<label style="margin-left:10px">
+										<?php echo $form->radioButton($model, 'FreedomFighter', array('value' => 'Y', 'uncheckValue' => null)); ?>
+										<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "YES")?></span>
+									</label>
+								</p>
+							</div>
+						
+
+							<h3><?=Yii::t('p_info', "Are you a government employee")?>?<span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.16")?>"></i></h3>
+							<div class="col-lg-12">
+								<div class='col-lg-offset-4 col-lg-4' id="govEmployee_error"></div>
+							</div>
+							<div class="info">
+								<p>
+									<label>
+										<?php echo $form->radioButton($model, 'GovernmentEmployee', array('value' => 'N', 'uncheckValue' => null)); ?>
+										<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "NO")?></span>
+									</label>
+									<label style="margin-left:10px">
+										<?php echo $form->radioButton($model, 'GovernmentEmployee', array('value' => 'Y', 'uncheckValue' => null)); ?>
+										<span class="overlay"></span> <span class="text"><?=Yii::t('p_info', "YES")?></span>
+									</label>
+								</p>
+							</div>
+					
+
+							<h3><?=Yii::t('p_info', "Area of residence")?><span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.20")?>"></i></h3>
+							<div class="col-lg-12">
+								<div class='col-lg-offset-4 col-lg-4' id="AreaOfResidence_error"></div>
+							</div>
+							<div class="mail-box">
+								<select id="PersonalInformation_AreaOfResidence" class="form-control" name="PersonalInformation[AreaOfResidence]">
+									<option value="">Choose</option>
+									<option value="1" <?php echo ($model->AreaOfResidence == '1' ? 'selected="selected"' : ''); ?>> <?=Yii::t('p_info', "Dhaka and Chittagong City Corporation")?></option>
+									<option value="2" <?php echo ($model->AreaOfResidence == '2' ? 'selected="selected"' : ''); ?>><?=Yii::t('p_info', "Other City Corporation")?></option>
+									<option value="3" <?php echo ($model->AreaOfResidence == '3' ? 'selected="selected"' : ''); ?>> <?=Yii::t('p_info', "Other Areas")?></option>
+
+
+
+								</select>
+							</div>
+						
+<!--
+################   TAX ZONE   #######################
+-->
+<h3><?=Yii::t('p_info', "Tax zone")?><span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.17")?>"></i></h3>
+<div class="present-address-group mail-box">
+	<div class="col-lg-12">
+		<div id="tax_zone_error"></div>
+	</div>
+	<div class="clearfix"></div>
+
+	<div class="col-lg-6">
+		<p style="color:#7a7a7a;text-align: left;font-weight: 500;"><?php echo Yii::t('p_info', "Taxes Circle");?></p>
+		<?php echo $form->textField($model, 'TaxesCircle', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "Taxes Circle"))); ?>
+	</div>
+
+	<div class="col-lg-6">
+		<p style="color:#7a7a7a;text-align: left;font-weight: 500;"><?php echo Yii::t('p_info', "Taxes Zone");?></p>
+		<?php echo $form->textField($model, 'TaxesZone', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "Taxes Zone"))); ?>
+	</div>
+	<div class="clearfix"></div>
+
+	<!-- <div class="col-lg-6">
+		<?php echo CHtml::dropDownList('TypeOfIncomeId', @$model->TaxZoneCircle->TypeOfIncomeId, CHtml::listData(TypeOfIncome::model()->findAll(), 'TypeOfIncomeId', 'TypeName'), array('empty' => 'Please Select Income Type', 'class' => 'form-control', 'onchange' => 'getSubCat(this.value, "")')); ?>
+	</div>
+	<div class="col-lg-6">
+		<?php echo CHtml::dropDownList('SubCatIncomeId', '', [], array('empty' => 'Please Select Sub Category', 'class' => 'form-control', 'onchange' => 'getEmployer(this.value, "")')); ?>
+	</div>
+	<div class="clearfix"></div>
+	<br>
+	<div class="col-lg-12">
+		<?php echo CHtml::dropDownList('TaxZoneCircleId', '', [], array('empty' => 'Please Select Employer Name', 'class' => 'form-control', 'onchange' => 'getCircleZone(this.value)')); ?>
+	</div>
+	<div class="clearfix"></div>
+	<br>
+	<div class="col-lg-6">
+		<b><?=Yii::t('p_info', "Circle code")?>:</b> <span id="CircleCode"><?=@$model->TaxZoneCircle->CircleCode?></span>
+	</div>
+	<div class="col-lg-6">
+		<b><?=Yii::t('p_info', "Circle name")?>:</b> <span id="CircleName"><?=@$model->TaxZoneCircle->CircleName?></span>
+	</div>
+	<div class="clearfix"></div>
+	<br>
+	<div class="col-lg-6">
+		<b><?=Yii::t('p_info', "Zone code")?>:</b> <span id="ZoneName"><?=@$model->TaxZoneCircle->ZoneName?></span>
+	</div>
+	<div class="col-lg-6">
+		<b><?=Yii::t('p_info', "Circle address")?>:</b> <span id="CircleAddress"><?=@$model->TaxZoneCircle->CircleAddress?></span>
+	</div>
+	<div class="clearfix"></div> -->
+</div>
+
+<!--
+################   END TAX ZONE   #######################
+-->
+
+<!--
+################   START Employee/Business name, address   #######################
+-->
+
+<h3><?=Yii::t('p_info', "Please enter the name and address of your employer / business")?> &nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.18")?>"></i></h3>
+
+<div class="mail-box">
+	<div class="col-lg-6">
+		<?php echo $form->textField($model, 'EmployerName', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "Employer Name"))); ?>
+	</div>
+
+	<div class="col-lg-6">
+		<?php echo $form->textArea($model, 'EmployerAddress', array('size' => 20, 'maxlength' => 255, 'class' => 'form-control', 'placeholder' => Yii::t('p_info', "Employer Address"))); ?>
+	</div>
+</div>
+<br />
+<br />
+<br />
+
+<div class="mail-box">
+	<div class="col-lg-12">
+		<?php echo $form->textField($model, 'BusinessIdentificationNumber', array('class' => 'form-control int_field', 'placeholder' => Yii::t('p_info', "Business Identification Number"),'maxlength' => '12')); ?>
+	</div>
+</div>
+<br />
+<br />
+
+<div class="clearfix"></div>
+<!--
+################   END Employee/Business name, address    #######################
+-->
+
+
+<h3><?=Yii::t('p_info', "Please enter your present address")?><span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.19")?>"></i></h3>
+<div class="present-address-group mail-box">
+
+	<div class="clearfix"></div>
+
+<!-- 	<div class="col-lg-3">
+		<?php echo $form->textField($model, 'Area', array('class' => 'form-control', 'placeholder' => "Area")); ?>
+	</div>
+	<div class="col-lg-9">
+		<?php echo $form->textField($model, 'SectorBlock', array('class' => 'form-control', 'placeholder' => "What is your sector, block ")); ?>
+	</div> -->
+	<!-- 	<div class="col-lg-3">
+		<?php //echo $form->textField($model, 'Road',array('class'=>'form-control', 'placeholder'=>"Road info") ); ?>
+	</div> -->
+
+	<div class="col-lg-12">
+		<div id="PersonalInformation_presentAddress_error"></div>
+		<?php echo $form->textArea($model, 'PresentAddress', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "Address line 1"))); ?>
+	</div>
+
+	<div class="clearfix"></div><p class="p_color"></p>
+
+	<div class="col-lg-9">
+		<?php //echo $form->textField($model, 'House',array('class'=>'form-control', 'placeholder'=>"House info") ); ?>
+		<?php echo $form->textField($model, 'Area', array('class' => 'form-control', 'placeholder' =>Yii::t('p_info', "Address line 2") )); ?>
+	</div>
+	<div class="col-lg-3">
+		<?php echo $form->textField($model, 'ZipCode', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "Postcode"))); ?>
+	</div>
+	<div class="clearfix"></div><p class="p_color"></p>
+
+
+	<div class="col-lg-6">
+		<div id="PersonalInformation_division_error"></div>
+		<?php echo $form->dropDownList($model, 'DivisionId', CHtml::listData(Divisions::model()->findAll(), 'id', 'Name'), array('empty' => 'Please select division', 'class' => 'form-control')); ?>
+	</div>
+
+	<div class="col-lg-6">
+		<div id="PersonalInformation_district_error"></div>
+		<div class="district_area">
+			<?php
+			if($model->CPIId != ''){
+				$districtList = Districts::model()->findAllByAttributes(array(
+                        'division_id' => $model->DivisionId
+                    ));
+			}
+			else {
+				$districtList = Districts::model()->findAll();
+			}
+			echo $form->dropDownList($model, 'DistrictId', CHtml::listData($districtList, 'id', 'name'), array('empty' => 'Please select district', 'class' => 'form-control'));
+			?>
+		</div>
+	</div>
+
+	<?php
+$SC = IncomeSalaries::model()->count('CPIId=:data AND EntryYear=:data2', array(':data' => Yii::app()->user->CPIId, ':data2' => $this->taxYear()));
+echo CHtml::hiddenField('SC', $SC, array('id' => 'SC'));?>
+
+	<?php echo CHtml::hiddenField('employeeType', @$model->GovernmentEmployee, array('id' => 'employeeType')); ?>
+
+	<div class="col-lg-12">
+		<div class="checkbox">
+			<label  class="checkbox-inline" >
+				<?php echo $form->checkBox($model, 'AddressSame', array('value' => 1, 'uncheckValue' => 0, 'checked' => ($model->AddressSame == '1') ? true : false)); ?>
+				<?=Yii::t('p_info', "Both are same")?>.
+			</label>
+		</div>
+	</div>
+
+	<div class="col-lg-12">
+		<div id="PermanentAddressBox" <?php echo ($model->AddressSame == 0) ? '' : 'style="display:none;"'; ?>>
+			<h3><?=Yii::t('p_info', "Please enter your permanent address")?><span class="required">*</span>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "2.22")?>"></i></h3>
+			<div id="PersonalInformation_permanentAddress_error"></div>
+			<?php echo $form->textArea($model, 'PermanentAddress', array('class' => 'form-control', 'placeholder' => Yii::t('p_info', "Permanent Address"))); ?>
+		</div>
+	</div>
+	<div class="clearfix"></div><p class="p_color"></p>
+
+	<h3><?=Yii::t('p_info', "Contact Details")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips', "")?>"></i></h3>
+			<div id="email_error"></div>
+		<div class="col-lg-6">
+			<?php 
+				if(isset($payments) && $payments == 1){
+					echo $form->textField($model, 'Contact', array('class' => 'form-control int_field', 'placeholder' =>Yii::t('p_info', "Mobile No."), 'readonly'=>'true', 'style'=>'cursor:pointer')); 
+				}else{
+					echo $form->textField($model, 'Contact', array('class' => 'form-control int_field', 'placeholder' =>Yii::t('p_info', "Mobile No."))); 
+				}
+			?>
+		</div>
+		<div class="col-lg-6">
+			<?php 
+				if(isset($payments) && $payments == 1){
+					echo $form->emailField($model, 'Email', array('class' => 'form-control', 'type' => "Email", 'placeholder' => Yii::t('p_info', "E-mail Address"), 'readonly'=>'true', 'style'=>'cursor:pointer')); 
+				}else{
+					echo $form->emailField($model, 'Email', array('class' => 'form-control', 'type' => "Email", 'placeholder' => Yii::t('p_info', "E-mail Address"))); 
+				}
+				?>
+			<?php echo $form->error($model, 'Email', array('class' => 'required')); ?>
+		</div>
+
+	<div class="clearfix"></div><p class="p_color"></p>
+
+	<div id="PersonalInformation_details2_success"></div>
+
+<?php if ( isset (Yii::app()->user->org_id) ) : ?>
+	
+	<?php if ( $userCount == 0 ) : ?>
+	<div class="col-lg-12">
+		<div class="checkbox">
+			<label  class="checkbox-inline" >
+				<input id="createAccount" value="1" name="createAccount" type="checkbox">
+				<?= Yii::t('p_info', "Create Account For This Client.") ?>
+			</label>
+		</div>
+	</div>
+	<?php else : ?>
+	<div class="col-lg-12" style="text-align: center;">
+		<div class="checkbox">
+			<b>The user has login account with <i>"<?=@$userModel->email?>"</i></b>
+		</div>
+	</div>
+	<?php endif; ?>
+	<div class="col-lg-12">
+		<div id="createAccount_error"></div>
+	</div>
+
+	<div class="clearfix"></div><p class="p_color"></p>
+<?php endif; ?>
+	
+	<p class="button-padding">
+		<button class="btn btn-success btn-lg" type="button" id="PIDetails-2_btn"><?=Yii::t('p_info', "Save & Continue")?></button>
+	</p>
+</div>
+
+
+<div class="login-button input-group">
+	<div class="back pull-left">
+		<a class="btn btn-success for-clr" data-toggle="tab" href="#PIDetails-1"  id="knowMe_btn" > <i class="fa fa-chevron-left"></i><span class="previous-text"> <?=Yii::t('common', "Previous")?></span></a>
+	</div>
+	<div class="back pull-right">
+		 <a class="btn btn-success for-clr" href="<?=Yii::app()->baseUrl?>/index.php/personalInformation/review" id="final_btn"><span class="previous-text"> <?=Yii::t('common', "Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</form>
+</div>
+<!-- ###############-------PIDetails-2-----END-------------############# -->
+
+<!-- ################# My Document START ################ -->
+            <div role="tabpanel" class="tab-pane" id="myDocs">
+
+            	<div class="row">
+                    <div class="col-lg-12 center">
+                        <h2><?=Yii::t("user","My Documents")?>&nbsp;&nbsp;</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+						<div class="payment-status-document bs-common-example">
+                            <table id="my_doc_table" class="table table-bordred table-striped table-hove" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th><?=Yii::t("dashboard","Tax Year")?></th>
+                                        <th><?=Yii::t("user","Document Name")?></th>
+                                        <th><?=Yii::t("user","Notes")?></th>
+                                        <th style="text-align: center;"><?=Yii::t("user","Download")?></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($docs as $key => $doc) : ?>
+                                        <tr>
+                                            <td width="10%"><?=$doc->tax_year?></td>
+                                            <td width="20%"><?=$doc->doc_name?></td>
+                                            <td width="55%"><?=$doc->notes?></td>
+                                            <td style="text-align: center;">
+                                                <a title="" data-toggle="tooltip" href="<?=Yii::app()->createUrl("user/admin/downloadMyDoc/id/".$doc->id)?>" data-original-title="<?=Yii::t("user","Download Document")?>" target="_blank">
+                                                    <i class="fa fa-download fa-lg"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+						</div>
+                    </div>
+                </div>
+            </div>
+</div>
+</div>
+
+<!-- ##################---------END---------TAB--------------############# -->
+<?php $this->endWidget();?>
+
+<!-- Modal - requiredDocuments -->
+<div class="modal fade" id="requiredDocuments" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title" id="myModalLabel"><strong>Documents/Information to be submitted along with the return:</strong></h3>
+      </div>
+      <div class="modal-body">
+        <ol>
+          <li><strong>Salary:</strong><br>
+            Salary statement, Bank Statement/Certificate if Bank Account present or Interest income from bank, Proof for Investment allowances (e.g For Life Insurance policy proof of Premium Payment).</li>
+          <li><strong>Interest on Securities:</strong><br>
+        Photocopy of Bond/Debenture of the year when it was bought, If Interest income then approval from Interest Giving Authority, If Bond/Debenture is bought by Loan from Institution then Bank Statement/Certificate regarding payment of Interest or Approval Certificate from Institution.</li>
+          <li><strong>From House Property:</strong><br>
+            Rental Agreement supporting the House Rent or Copy of slip for Rent, Monthly Statement of Rent Received, Bank Statement of the Account in which Rent received, Copy of slip supporting payment of Municipal Tax Land Tax City Corporation Tax, If house bought/constructed on loan from bank then bank statement supporting interest payment, Copy for premium payment for insurance of house property.</li>
+          <li><strong>Business or Profession:</strong><br>
+        Income statement and Balance sheet of Business/Profession.</li>
+          <li><strong>Profit from Partnership Firm:</strong><br>
+          Income statement and Balance sheet of Firm.</li>
+          <li><strong>Capital Gains:</strong><br>
+          Copy of deed for sale of immovable property, Photocopy of challan/pay order if any TDS, Documents supporting profit from transactions of share of company listed in stock exchange.</li>
+          <li><strong>Other Sources:</strong><br>
+          If any cash dividend then bank statement and copy of dividend warrant/certificate, Copy of certificate at the time of interest income or encashment of saving instruments, Bank statement/certificate if interest income from bank, Documents related to any other income.</li>
+          <li><strong>Proof of TDS:</strong><br>
+            Copy of challan of tax payment, pay order/bank draft/account payee cheque (up to 10,000 payment can be done through treasury challan.above this payment must be done through pay order/bank draft/account payee cheque), Certificate from TDS authority if any TDS.</li>
+        </ol>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- |||||||||||||||||||||START of JAVA & STYLE SCRIPT PART||||||||||||||||||||||| -->
+
+<script type="text/javascript">
+
+    var pi_msg="<?php echo Yii::t('p_info', "Please enter the E-TIN and it should be at least 12 digits."); ?>";
+    var pi_msg_full_name="<?php echo Yii::t('p_info', "Please enter your full name"); ?>";
+    var pi_msg_birth="<?php echo Yii::t('p_info', "Please enter your date of birth"); ?>";
+    var pi_msg_marital="<?php echo Yii::t('p_info', "Please select your marital status"); ?>";
+    var pi_msg_gender="<?php echo Yii::t('p_info', "Please enter your gender"); ?>";
+    var pi_msg_residential="<?php echo Yii::t('p_info', "Please enter your residential status"); ?>";
+    var pi_msg_spouse="<?php echo Yii::t('p_info', "Please enter your spouse's name"); ?>";
+	var pi_url = "<?php echo Yii::app()->request->baseUrl; ?>/index.php/personalInformation/";
+	var pi_url2 = "<?php echo Yii::app()->request->baseUrl; ?>/index.php/personalInformation";
+	TaxZoneCircleId = <?=(!isset($model->TaxZoneCircleId) || $model->TaxZoneCircleId == null) ? "''" : $model->TaxZoneCircleId?>;
+	TypeOfIncomeId = <?=(!isset($model->TaxZoneCircle->TypeOfIncomeId) || $model->TaxZoneCircle->TypeOfIncomeId == null) ? "''" : $model->TaxZoneCircle->TypeOfIncomeId?>;
+	SubCatIncomeId = <?=(!isset($model->SubCatIncomeId) || $model->SubCatIncomeId == null) ? "''" : $model->SubCatIncomeId?>;
+
+</script>
+
+<script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/pi/pi.js?v=<?=$this->v?>"></script>
+
+<style type="text/css">
+
+	#myTab {
+		display:inline;
+	}
+
+	#myTab.nav.nav-tabs.nav-tabs-sticky li.active a
+	{
+		border-radius: inherit!important;
+		border-color:#FFFFFF;
+	}
+</style>
+
+<style type="text/css">
+
+	/*=====================================-------------------------=======================================*/
+	div.clear
+	{
+		clear: both;
+	}
+	div.product-chooser{
+
+	}
+	div.product-chooser.disabled div.product-chooser-item
+	{
+		zoom: 1;
+		filter: alpha(opacity=60);
+		opacity: 0.6;
+		cursor: default;
+	}
+	div.product-chooser div.product-chooser-item{
+		padding: 11px;
+		border-radius: 6px;
+		cursor: pointer;
+		position: relative;
+		border: 1px solid #efefef;
+		margin-bottom: 10px;
+		margin-left: 10px;
+		margin-right: 10x;
+	}
+	div.product-chooser div.product-chooser-item.selected{
+		/*border: 4px solid #428bca;*/
+		background: #47A447;
+		padding: 8px;
+		filter: alpha(opacity=100);
+		opacity: 1;
+	}
+	div.product-chooser div.product-chooser-item img{
+		padding: 0;
+	}
+	div.product-chooser div.product-chooser-item span.title{
+		display: block;
+		margin: 10px 0 5px 0;
+		font-weight: bold;
+		font-size: 12px;
+	}
+	div.product-chooser div.product-chooser-item span.description{
+		font-size: 12px;
+	}
+	div.product-chooser div.product-chooser-item input{
+		position: absolute;
+		left: 0;
+		top: 0;
+		visibility:hidden;
+	}
+	/*==================-------------------===============*/
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#PersonalInformation_Contact").mask("99999999999");
+        $('#my_doc_table').DataTable();
+    });
+</script>
+
+
+
+
+

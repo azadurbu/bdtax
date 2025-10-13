@@ -1,0 +1,15 @@
+$(document).ready(function(){
+
+});
+
+function next_pre(id)
+{
+    window.location.href = "#"+id;
+    $('#expenditure_tab a[href="#'+id+'"]').tab('show');
+}
+
+function hide_show(hide, show)
+{
+    $("#"+hide).hide();
+    $("#"+show).fadeIn();
+}

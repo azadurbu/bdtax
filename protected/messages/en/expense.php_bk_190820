@@ -1,0 +1,15 @@
+<?php
+
+return array(
+	'Personal or Food'=>'Personal or Food',
+
+    // 'Surcharge and Other Expenses'=>'সারচার্জ এবং অন্যান্য ব্যয়',
+    'Surcharge and Other'=>'Total Tax Paid,Surcharge and Other',
+	'Surcharge and others Expenses'=>'Tax Paid Last Year, Surcharge and others Expenses',
+    'Please enter your surcharge and other expenses'=>'Please enter your paid tax of last year, surcharge and other expenses',
+    'Did you have any Surcharge and Other expenses'=>'Did you paid tax of last year, surcharge and other expenses',
+    'Surcharge And Other Expenses'=>'Tax Paid Last Year, Surcharge and others Expenses',
+    'Surcharge And Other'=>'Total Tax Paid, Surcharge and Other',
+    'Surcharge and Other Expenses'=>'Tax Paid Last Year, Surcharge and others Expenses',
+
+	);

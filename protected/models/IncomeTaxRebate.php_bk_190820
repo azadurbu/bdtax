@@ -1,0 +1,153 @@
+<?php
+
+/**
+ * This is the model class for table "income_tax_rebate".
+ *
+ * The followings are the available columns in table 'income_tax_rebate':
+ * @property integer $IncomeTaxRebateId
+ * @property double $LifeInsurancePremium
+ * @property double $DeferredAnnuity
+ * @property double $ProvidentFund
+ * @property double $SCECProvidentFund
+ * @property double $SuperAnnuationFund
+ * @property double $InvestInStockOrShare
+ * @property double $DepositPensionScheme
+ * @property double $BenevolentFund
+ * @property double $ZakatFund
+ * @property double $Others
+ * @property string $CerateAt
+ * @property string $LastUpdateAt
+ * @property integer $CPIId
+ * @property string $EntryYear
+ * @property integer $trash
+ *
+ * The followings are the available model relations:
+ * @property Income[] $incomes
+ * @property PersonalInformation $cPI
+ */
+class IncomeTaxRebate extends CActiveRecord
+{
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return IncomeTaxRebate the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
+	{
+		return 'income_tax_rebate';
+	}
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			// array('LifeInsurancePremium, DeferredAnnuity, ProvidentFund, SCECProvidentFund, SuperAnnuationFund, InvestInStockOrShare, DepositPensionScheme, BenevolentFund, ZakatFund, Others, CerateAt, CPIId, EntryYear', 'required'),
+			array('CPIId, trash', 'numerical', 'integerOnly'=>true),
+			array('LifeInsurancePremium, PolicyValue, DeferredAnnuity, ProvidentFund, SCECProvidentFund, SuperAnnuationFund, InvestInStockOrShare, DepositPensionScheme, BenevolentFund, ZakatFund, Others, Computer, Laptop, LifeInsurancePremium_1, DeferredAnnuity_1, ProvidentFund_1, SCECProvidentFund_1, SuperAnnuationFund_1, InvestInStockOrShare_1, DepositPensionScheme_1, BenevolentFund_1, ZakatFund_1, Others_1, Computer_1, Laptop_1, SavingsCertificates, BangladeshGovtTreasuryBond, DonationNLInstitutionFON, DonationCharityHospitalNBR, DonationOrganizationRetardPeople, ContributionNLInstituionLW, ContributionLiberationWarMuseum, ContributionAgaKhanDN, ContributionAsiaticSocietyBd, DonationICDDRB, DotationCRP, DonationEduInstitutionGov, ContributionAhsaniaMissionCancerHospital, 
+SavingsCertificates_1, BangladeshGovtTreasuryBond_1, DonationNLInstitutionFON_1, DonationCharityHospitalNBR_1, DonationOrganizationRetardPeople_1, ContributionNLInstituionLW_1, ContributionLiberationWarMuseum_1, ContributionAgaKhanDN_1, ContributionAsiaticSocietyBd_1, DonationICDDRB_1, DotationCRP_1, DonationEduInstitutionGov_1, ContributionAhsaniaMissionCancerHospital_1', 'numerical'),
+			array('EntryYear', 'length', 'max'=>9),
+			array('LastUpdateAt', 'safe'),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('IncomeTaxRebateId, LifeInsurancePremium, DeferredAnnuity, ProvidentFund, SCECProvidentFund, SuperAnnuationFund, InvestInStockOrShare, DepositPensionScheme, BenevolentFund, ZakatFund, Others, CerateAt, LastUpdateAt, CPIId, EntryYear, trash', 'safe', 'on'=>'search'),
+		);
+	}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+			'incomes' => array(self::HAS_MANY, 'Income', 'IncomeTaxRebateId'),
+			'cPI' => array(self::BELONGS_TO, 'PersonalInformation', 'CPIId'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
+	{
+		return array(
+			'IncomeTaxRebateId' => Yii::t('income',"Income Tax Rebate"),
+			'LifeInsurancePremium' => Yii::t('income',"Life Insurance Premium"),
+			'DeferredAnnuity' => Yii::t('income',"Contribution to Deferred Annuity"),
+			'ProvidentFund' => Yii::t('income',"Contribution to Provident Fund to which Provident Fund Act, 1925 Applies"),
+			'SCECProvidentFund' => Yii::t('income',"Self Contribution and Employer’s Contribution to Recognized Fund"),
+			'SuperAnnuationFund' => Yii::t('income',"Contribution to Super Annuation Fund"),
+			'InvestInStockOrShare' => Yii::t('income',"Investment in Approved Debenture or Debenture Stock, Stock or Shares"),
+			'DepositPensionScheme' => Yii::t('income',"Contribution to Deposit Pension Scheme"),
+			'BenevolentFund' => Yii::t('income',"Contribution to Benevolent Fund and Group Insurance Premium"),
+			'ZakatFund' => Yii::t('income',"Contribution to Zakat Fund"),
+			'Others' => Yii::t('income',"Other"),
+			'SavingsCertificates' => Yii::t('income',"Investment in Savings Certificates / Sanchaypatra"),
+			'BangladeshGovtTreasuryBond' => Yii::t('income',"Investment in Bangladesh Govt. Treasury Bond"),
+			'DonationNLInstitutionFON' => Yii::t('income',"Donation to National Level Institution set up in the memory of Father of the Nation"),
+			'DonationCharityHospitalNBR' => Yii::t('income',"Donation to a Charitable Hospital recognized by NBR"),
+			'DonationOrganizationRetardPeople' => Yii::t('income',"Donation to Organizations set up for the welfare of retarded people"),
+			'ContributionNLInstituionLW' => Yii::t('income',"Contribution to national level institution set up in memory of Liberation war"),
+			'ContributionLiberationWarMuseum' => Yii::t('income',"Contribution to Liberation war Museum"),
+			'ContributionAgaKhanDN' => Yii::t('income',"Contribution to Aga Khan Development Network"),
+			'ContributionAsiaticSocietyBd' => Yii::t('income',"Contribution to Asiatic Society,Bangladesh"),
+			'DonationICDDRB' => Yii::t('income',"Donation to ICDDRB (The International Centre for Diarrhoeal Disease Research Bangladesh)"),
+			'DotationCRP' => Yii::t('income',"Donation to Centre for the Rehabilitation of the Paralysed (CRP)"),
+			'DonationEduInstitutionGov' => Yii::t('income',"Donation to Educational Institution recognized by Government"),
+			'ContributionAhsaniaMissionCancerHospital' => Yii::t('income',"Contribution to Ahsania Mission Cancer Hospital"),
+			'Computer' => Yii::t('income',"Computer"),
+			'Laptop' => Yii::t('income',"Laptop"),
+			'CerateAt' => 'Cerate At',
+			'LastUpdateAt' => 'Last Update At',
+			'CPIId' => 'Cpiid',
+			'EntryYear' => 'Entry Year',
+			'trash' => 'Trash',
+		);
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function search()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
+
+		$criteria=new CDbCriteria;
+
+		$criteria->compare('IncomeTaxRebateId',$this->IncomeTaxRebateId);
+		$criteria->compare('LifeInsurancePremium',$this->LifeInsurancePremium);
+		$criteria->compare('DeferredAnnuity',$this->DeferredAnnuity);
+		$criteria->compare('ProvidentFund',$this->ProvidentFund);
+		$criteria->compare('SCECProvidentFund',$this->SCECProvidentFund);
+		$criteria->compare('SuperAnnuationFund',$this->SuperAnnuationFund);
+		$criteria->compare('InvestInStockOrShare',$this->InvestInStockOrShare);
+		$criteria->compare('DepositPensionScheme',$this->DepositPensionScheme);
+		$criteria->compare('BenevolentFund',$this->BenevolentFund);
+		$criteria->compare('ZakatFund',$this->ZakatFund);
+		$criteria->compare('Others',$this->Others);
+		$criteria->compare('CerateAt',$this->CerateAt,true);
+		$criteria->compare('LastUpdateAt',$this->LastUpdateAt,true);
+		$criteria->compare('CPIId',$this->CPIId);
+		$criteria->compare('EntryYear',$this->EntryYear,true);
+		$criteria->compare('trash',$this->trash);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}

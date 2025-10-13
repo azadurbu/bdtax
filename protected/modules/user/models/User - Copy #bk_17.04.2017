@@ -1,0 +1,396 @@
+<?php
+
+class User extends CActiveRecord
+{
+	const STATUS_NOACTIVE=0;
+	const STATUS_ACTIVE=1;
+	const STATUS_BANNED=-1;
+	public $logo_image;
+
+	public $Org;
+	public $Role;
+	
+	//TODO: Delete for next version (backward compatibility)
+	const STATUS_BANED=-1;
+	
+	/**
+	 * The followings are the available columns in table 'users':
+	 * @var integer $id
+	 * @var string $username
+	 * @var string $password
+	 * @var string $email
+	 * @var string $activkey
+	 * @var string $mobile
+	 * @var integer $createtime
+	 * @var integer $lastvisit
+	 * @var integer $superuser
+	 * @var integer $status
+     * @var timestamp $create_at
+     * @var timestamp $lastvisit_at
+	 */
+
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @return CActiveRecord the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
+	{
+		return Yii::app()->getModule('user')->tableUsers;
+	}
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.CConsoleApplication
+		return ((get_class(Yii::app())=='CConsoleApplication' || (get_class(Yii::app())!='CConsoleApplication' && Yii::app()->getModule('user')->isAdmin()))?array(
+			array('first_name', 'length', 'max'=>20, 'min' => 3,'message' => Yii::t('user',"Incorrect First Name (length between 3 and 20 characters).")),
+			array('middle_name', 'length', 'max'=>20, 'min' => 3,'message' => Yii::t('user',"Incorrect Middle Name (length between 3 and 20 characters).")),
+			array('last_name', 'length', 'max'=>20, 'min' => 3,'message' => Yii::t('user',"Incorrect Last Name (length between 3 and 20 characters).")),
+//            array('dob', 'date', 'format'=>'mm-dd-yyyy'),
+			array('password', 'length', 'max'=>128, 'min' => 4,'message' => Yii::t('user',"Incorrect password (minimal length 4 symbols).")),
+			array('email', 'email'),
+			array('email', 'unique', 'message' => Yii::t('user',"This user's email address already exists.")),
+			array('status', 'in', 'range'=>array(self::STATUS_NOACTIVE,self::STATUS_ACTIVE,self::STATUS_BANNED)),
+			array('superuser', 'in', 'range'=>array(0,1)),
+			array('create_at', 'default', 'value' => date('Y-m-d H:i:s'), 'setOnEmpty' => true, 'on' => 'insert'),
+			array('lastvisit_at', 'default', 'value' => '0000-00-00 00:00:00', 'setOnEmpty' => true, 'on' => 'insert'),
+			array('role_id, email, first_name, last_name', 'required'),
+			array('superuser, status', 'numerical', 'integerOnly'=>true),
+			array('mobile', 'safe'),
+			array('id, password, email, activkey, create_at, lastvisit_at, superuser, status, address1, address2, city, state, zip_code, margin, mobile', 'safe', 'on'=>'search'),
+			):((Yii::app()->user->id==$this->id)?array(
+				array('first_name', 'length', 'max'=>20, 'min' => 3,'message' => Yii::t('user',"Incorrect First Name (length between 3 and 20 characters).")),
+				array('last_name', 'length', 'max'=>20, 'min' => 3,'message' => Yii::t('user',"Incorrect Last Name (length between 3 and 20 characters).")),
+				array('middle_name', 'length', 'max'=>20, 'min' => 3,'message' => Yii::t('user',"Incorrect Middle Name (length between 3 and 20 characters).")),
+				array('password, email', 'required'),
+				array('email', 'email'),
+				array('mobile', 'safe'),
+				array('id, password, email, create_at, lastvisit_at, superuser, status, city, state, zip_code, dob, mobile', 'safe'),
+				array('id, password, email, create_at, lastvisit_at, superuser, status, city, state, zip_code, dob, mobile', 'safe', 'on'=>'search'),
+				array('email', 'unique', 'message' => Yii::t('user',"This user's email address already exists.")),
+				):array()));
+}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+			'org' => array(self::BELONGS_TO, 'Organizations', 'org_id'),
+			'userRole' => array(self::BELONGS_TO, 'Role', 'role_id'),
+			);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
+	{
+		return array(
+			'id' => Yii::t('user',"Id"),
+			'mobile'=>Yii::t('user',"Mobile"),
+			'dob'=>Yii::t('user',"Date of birth"),
+			'zip_code'=>Yii::t('user',"Zip code"),
+			'password'=>Yii::t('user',"password"),
+			'verifyPassword'=>Yii::t('user',"Retype password"),
+			'email'=>Yii::t('user',"E-mail"),
+			'verifyCode'=>Yii::t('user',"Verification code"),
+			'activkey' => Yii::t('user',"activation key"),
+			'createtime' => Yii::t('user',"Registration Date"),
+			'create_at' => Yii::t('user',"Registration Date"),
+			'lastvisit_at' => Yii::t('user',"Last visit"),
+			'superuser' => Yii::t('user',"Superuser"),
+			'status' => Yii::t('user',"Active / Inactive"),			
+			'Role' => Yii::t('user',"Assigned Role"),
+			'first_name' => Yii::t('user',"First Name"),
+			'last_name' => Yii::t('user',"Last Name"),
+			'middle_name' => Yii::t('user',"Middle Name"),
+			'role_id' => Yii::t('user',"Assigned Role"),
+			);
+	}
+	
+	
+	public function scopes()
+	{
+		return array(
+			'active'=>array(
+				'condition'=>'status='.self::STATUS_ACTIVE,
+				),
+			'notactive'=>array(
+				'condition'=>'status='.self::STATUS_NOACTIVE,
+				),
+			'banned'=>array(
+				'condition'=>'status='.self::STATUS_BANNED,
+				),
+			'superuser'=>array(
+				'condition'=>'superuser=1',
+				),
+			'notsafe'=>array(
+				'select' => '*',
+				),
+			);
+	}
+	
+	public function defaultScope()
+	{
+		return CMap::mergeArray(Yii::app()->getModule('user')->defaultScope,array(
+			'alias'=>'user',
+			'select' => '*',
+			));
+	}
+	
+	public static function itemAlias($type,$code=NULL) {
+		$_items = array(
+			'UserStatus' => array(
+				self::STATUS_NOACTIVE => Yii::t('user','Not active'),
+				self::STATUS_ACTIVE => Yii::t('user','Active'),
+				self::STATUS_BANNED => Yii::t('user','Banned'),
+				),
+			'AdminStatus' => array(
+				'0' => Yii::t('user','No'),
+				'1' => Yii::t('user','Yes'),
+				),
+			);
+		if (isset($code))
+			return isset($_items[$type][$code]) ? $_items[$type][$code] : false;
+		else
+			return isset($_items[$type]) ? $_items[$type] : false;
+	}
+	
+/**
+     * Retrieves a list of models based on the current search/filter conditions.
+     * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+     */
+public function search()
+{
+        // Warning: Please modify the following code to remove attributes that
+        // should not be searched.
+	$criteria=new CDbCriteria;
+
+
+        // $criteria->alias = 'usr';
+	$criteria->condition = 'user.trash != 1 AND user.role_id = 2';
+	   // $criteria->addInCondition('trash!=1');
+
+	if (Yii::app()->user->role == 'companyAdmin') {
+
+		$criteria->addInCondition('org_id', array(Yii::app()->user->org_id));
+
+	}
+        //-----------------------------------------------------------------------//
+
+	$criteria->compare('id', $this->id);
+	$criteria->compare('last_name', $this->last_name, true);
+	$criteria->compare('first_name', $this->first_name, true);
+	$criteria->compare('middle_name', $this->middle_name, true);
+	$criteria->compare('org.organization_name', $this->Org,true);
+	$criteria->compare('email', $this->email, true);
+	$criteria->compare('create_at', $this->create_at, true);
+	$criteria->compare('lastvisit_at', $this->lastvisit_at);
+	$criteria->compare('status', $this->status);
+	
+	if(isset($_REQUEST['User'])) {
+		$criteria->compare('userRole.role', $_GET['User']['Role'], true);		
+	}
+
+	$criteria->with=array(
+		'userRole'=>array(
+			'select'=>false,
+			'togather'=>true,
+			'search'=>true,
+			'joinType'=>'LEFT JOIN',
+			)
+		);
+	
+	return new CActiveDataProvider(get_class($this), array(
+		'criteria' => $criteria,
+		'pagination' => array(
+			'pageSize' => Yii::app()->getModule('user')->user_page_size,
+			),
+		'sort'=>array(
+			'attributes'=>array(
+				'Org'=>array(
+					'asc'=>'org.organization_name',
+					'desc'=>'org.organization_name DESC',
+					),
+				'Role'=>array(
+					'asc'=>'userRole.role',
+					'desc'=>'userRole.role DESC',
+					),
+				'*',
+				),
+
+			),
+		));
+}
+
+
+/**
+     * Retrieves a list of models based on the current search/filter conditions.
+     * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+     */
+public function deletedSearch()
+{
+        // Warning: Please modify the following code to remove attributes that
+        // should not be searched.
+
+	$criteria=new CDbCriteria;
+
+
+        // $criteria->alias = 'usr';
+	   // $criteria->addInCondition('trash!=1');
+
+	if (Yii::app()->user->role == 'companyAdmin') {
+
+		$criteria->addInCondition('org_id', array(Yii::app()->user->org_id));
+
+	} 
+	  // $criteria->condition = 'user.trash = 1';
+
+
+        //-----------------------------------------------------------------------//
+
+	$criteria->compare('id', $this->id);
+	$criteria->compare('last_name', $this->last_name, true);
+	$criteria->compare('first_name', $this->first_name, true);
+	$criteria->compare('middle_name', $this->first_name, true);
+	$criteria->compare('org.organization_name', $this->Org,true);
+	$criteria->compare('userRole.role', $this->Role, true);
+        // $criteria->compare('password', $this->password);
+	$criteria->compare('email', $this->email, true);
+        // $criteria->compare('activkey', $this->activkey);
+	$criteria->compare('create_at', $this->create_at, true);
+	$criteria->compare('lastvisit_at', $this->lastvisit_at);
+        // $criteria->compare('superuser', $this->superuser);
+	// $criteria->compare('status', $this->status);
+	$criteria->with=array(
+		'org'=>array(
+			'select'=>false,
+			'togather'=>true,
+			'joinType'=>'INNER JOIN',
+			), 
+		'userRole'=>array(
+			'select'=>false,
+			'togather'=>true,
+			'joinType'=>'INNER JOIN',
+			)
+		);
+
+	return new CActiveDataProvider(get_class($this), array(
+		'criteria' => $criteria,
+		'pagination' => array(
+			'pageSize' => Yii::app()->getModule('user')->user_page_size,
+			),
+		'sort'=>array(
+			'attributes'=>array(
+				'Org'=>array(
+					'asc'=>'org.organization_name',
+					'desc'=>'org.organization_name DESC',
+					),
+				'Role'=>array(
+					'asc'=>'userRole.role',
+					'desc'=>'userRole.role DESC',
+					),
+				'*',
+				),
+
+			),
+		));
+}
+
+public function getCreatetime() {
+	return strtotime($this->create_at);
+}
+
+public function setCreatetime($value) {
+	$this->create_at=date('Y-m-d H:i:s',$value);
+}
+
+public function getLastvisit() {
+	return strtotime($this->lastvisit_at);
+}
+
+public function setLastvisit($value) {
+	$this->lastvisit_at=date('Y-m-d H:i:s',$value);
+}
+
+    //----------------------------------------------FACEBOOK---------------------------------------------------//
+
+    /**
+     * Selects user in database and return data
+     * @param type $username
+     * @return \user|null 
+     */
+    public static function prepareUserForAuthorisation( $email )
+    {
+
+    	   // $user=User::model()->notsafe()->findByAttributes(array('email'=>$email));
+    	$user=User::model()->find('email=:data', array(':data'=>$email));
+
+
+    	if($user instanceof user)
+    	{
+    		return $user;
+    	}
+
+    	return NULL;
+
+    }        
+    
+    
+    /**
+     * Create random username
+     * @param type $lenght
+     * @return type 
+     */
+    public static function createRandomUsername($lenght = 10)
+    {
+    	$chars   = "QWERTZUIOPASDFGHJKLYXCVBNMasdfghjklqwertzuiopyxcvbnm1234567890";
+    	$shuffle = str_split($chars);
+    	shuffle($shuffle);
+    	$string  = implode("", $shuffle);
+    	return substr($string, 0, $lenght).time();
+    }
+    
+    /**
+     * Validate pasword
+     * If is facebook user dont validate password
+     * @param type $password
+     * @return boolean 
+     */
+    public function validatePassword($password) 
+    {
+    	if( $this->facebook_account ==  1)
+    	{
+    		return true;
+    	}
+
+    	return $this->password == self::hash($password);
+    }
+    
+    /**
+     * Hash password
+     * @param type $password
+     * @return type 
+     */
+    public static function hash($password) 
+    {
+    	return md5($password);
+    }    
+
+    //----------------------------------------------FACEBOOK---------------------------------------------------//
+}

@@ -1,0 +1,3096 @@
+<?php
+if(Yii::app()->user->hasFlash('alert_success')) 
+  $flash = Yii::app()->user->getFlash('alert_success');
+else
+  $flash = "";
+
+?>
+
+<!-- FLASH MESSAGE -->
+<div class="flash_alert">
+  <?php if($flash != ""): ?>
+    <div class="alert alert-success alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <?=$flash?>
+    </div>
+  <?php endif; ?>
+</div>
+<!-- END - FLASH MESSAGE -->
+
+<?php
+
+//COUNTS FOR TAB CHECKBOX
+$PersonalFoodingCount = $this->checkActiveInactive($model, "PersonalFoodingConfirm", "PersonalFoodingFOrT", "ExpPersonalFooding", "PersonalFoodingTotal");
+
+if($model->TotalTaxPaidLastYearConfirm == "No") {
+    $TaxPaidLastYearCount = 1;
+}
+else if($model->TotalTaxPaidLastYearConfirm == "Yes") {
+  if($model->TotalTaxPaidLastYear == "") {
+      $TaxPaidLastYearCount = 0;
+  }
+  else {
+    $TaxPaidLastYearCount = 1;
+  }
+}
+else {
+  $TaxPaidLastYearCount = 0;
+}
+
+
+
+$AccommodationCount = $this->checkActiveInactive($model, "AccommodationConfirm", "AccommodationFOrT", "ExpAccommodation", "AccommodationTotal");
+
+$TransportCount = $this->checkActiveInactive($model, "TransportConfirm", "TransportFOrT", "ExpTransport", "TransportTotal");
+
+$OtherTransportCount = $this->checkActiveInactive($model, "OtherTransportConfirm", "OtherTransportFOrT", "ExpOtherTransport", "OtherTransportTotal");
+
+$ElectricityBillCount = $this->checkActiveInactive($model, "ElectricityBillConfirm", "ElectricityBillFOrT", "ExpElectricityBill", "ElectricityBillTotal");
+
+$WasaBillCount = $this->checkActiveInactive($model, "WasaBillConfirm", "WasaBillFOrT", "ExpWasaBill", "WasaBillTotal");
+
+$GasBillCount = $this->checkActiveInactive($model, "GasBillConfirm", "GasBillFOrT", "ExpGasBill", "GasBillTotal");
+
+$TelephoneBillCount = $this->checkActiveInactive($model, "TelephoneBillConfirm", "TelephoneBillFOrT", "ExpTelephoneBill", "TelephoneBillTotal");
+
+$OtherHouseholdCount = $this->checkActiveInactive($model, "OtherHouseholdConfirm", "OtherHouseholdFOrT", "ExpOtherHousehold", "OtherHouseholdTotal");
+
+$ChildrenEducationCount = $this->checkActiveInactive($model, "ChildrenEducationConfirm", "ChildrenEducationFOrT", "ExpChildrenEducation", "ChildrenEducationTotal");
+
+$PersonalForeignTravelCount = $this->checkActiveInactive($model, "PersonalForeignTravelConfirm", "PersonalForeignTravelFOrT", "ExpPersonalForeignTravel", "PersonalForeignTravelTotal");
+
+$FestivalOtherSpecialCount = $this->checkActiveInactive($model, "FestivalOtherSpecialConfirm", "FestivalOtherSpecialFOrT", "ExpFestivalOtherSpecial", "FestivalOtherSpecialTotal");
+
+
+$DonationCount = $this->checkActiveInactive($model, "DonationConfirm", "DonationFOrT", "ExpDonation", "DonationTotal");
+
+$OtherSpecialCount = $this->checkActiveInactive($model, "OtherSpecialConfirm", "OtherSpecialFOrT", "ExpOtherSpecial", "OtherSpecialTotal");
+
+$OtherCount = $this->checkActiveInactive($model, "OtherConfirm", "OtherFOrT", "ExpOther", "OtherTotal");
+
+$TaxAtSourceCount = $this->checkActiveInactive($model, "TaxAtSourceConfirm", "TaxAtSourceFOrT", "ExpTaxAtSource", "TaxAtSourceTotal");
+
+$SurchargeOtherCount = $this->checkActiveInactive($model, "SurchargeOtherConfirm", "SurchargeOtherFOrT", "ExpSurchargeOther", "SurchargeOtherTotal");
+
+$LossDeductionsCount = $this->checkActiveInactive($model, "LossDeductionsConfirm", "LossDeductionsFOrT", "ExpLossDeductions", "LossDeductionsTotal");
+
+$GiftDonationContributionCount = $this->checkActiveInactive($model, "GiftDonationContributionConfirm", "GiftDonationContributionFOrT", "ExpGiftDonationContribution", "GiftDonationContributionTotal");
+
+//END OF COUNTS FOR TAB CHECKBOX
+
+//DATA FOR MULTIPLE ENTRY
+$PersonalFoodingList = ExpPersonalFooding::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$AccommodationList = ExpAccommodation::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$TransportList = ExpTransport::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$OtherTransportList = ExpOtherTransport::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$ElectricityBillList = ExpElectricityBill::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$WasaBillList = ExpWasaBill::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$GasBillList = ExpGasBill::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$TelephoneBillList = ExpTelephoneBill::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$OtherHouseholdList = ExpOtherHousehold::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$ChildrenEducationList = ExpChildrenEducation::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$PersonalForeignTravelList = ExpPersonalForeignTravel::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$FestivalOtherSpecialList = ExpFestivalOtherSpecial::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+
+$DonationList = ExpDonation::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$OtherSpecialList = ExpOtherSpecial::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$OtherList = ExpOther::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$TaxAtSourceList = ExpTaxAtSource::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$SurchargeOtherList = ExpSurchargeOther::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$LossDeductionsList = ExpLossDeductions::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+$GiftDonationContributionList = ExpGiftDonationContribution::model()->findAllByAttributes(array('ExpenditureId' => $model->ExpenditureId));
+
+
+$form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
+  'id'=>'expenditure-form',
+  'enableAjaxValidation'=>false,
+  )); 
+echo $form->hiddenField($model,'ExpenditureId'); 
+?>
+
+<div class="reg-form income-dashbord nav-tabs-sticky sticky-min-height">
+  <div role="tabpanel" id="expenditure_tab">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist" id="myTab">
+      
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.1")?>" class="active"><a href="#personal_food_expenses" role="tab" data-toggle="tab"> <?=($PersonalFoodingCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Personal or Food") ?></a></li>
+
+      <!-- <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.2")?>"><a href="#total_tax_paid_last_year" role="tab" data-toggle="tab"> <?=($TaxPaidLastYearCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Total Tax Paid") ?></a></li> -->
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.3")?>"><a href="#accommodation_expenses" role="tab" data-toggle="tab"> <?=($AccommodationCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Accommodation") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.4")?>"><a href="#transportation_expenses" role="tab" data-toggle="tab"> <?=($TransportCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Transportation") ?></a></li>
+      
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.12")?>"><a href="#other_transportation_expenses" role="tab" data-toggle="tab"> <?=($OtherTransportCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Other Transportation") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.5")?>"><a href="#electricity_expenses" role="tab" data-toggle="tab"> <?=($ElectricityBillCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Electricity") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.6")?>"><a href="#water_expenses" role="tab" data-toggle="tab"> <?=($WasaBillCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Water") ?></a></li>
+      
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.7")?>"><a href="#gas_expenses" role="tab" data-toggle="tab"> <?=($GasBillCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Gas") ?></a></li>
+      
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.8")?>"><a href="#telephone_expenses" role="tab" data-toggle="tab"> <?=($TelephoneBillCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Telephone") ?></a></li>
+      
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.12")?>"><a href="#other_household_expenses" role="tab" data-toggle="tab"> <?=($OtherHouseholdCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Other House Hold") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.9")?>"><a href="#child_edu_expenses" role="tab" data-toggle="tab"> <?=($ChildrenEducationCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Children Education") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.10")?>"><a href="#foreign_travel_expenses" role="tab" data-toggle="tab"> <?=($PersonalForeignTravelCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Domestic / Foreign Travel") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.17")?>"><a href="#festival_other_expenses" role="tab" data-toggle="tab"> <?=($FestivalOtherSpecialCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Festival") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.14")?>"><a href="#donation_expenses" role="tab" data-toggle="tab"> <?=($DonationCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Donation") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.15")?>"><a href="#other_special_expenses" role="tab" data-toggle="tab"> <?=($OtherSpecialCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Other Special") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.16")?>"><a href="#other_expenses" role="tab" data-toggle="tab"> <?=($OtherCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Other") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.17")?>"><a href="#tax_at_source_expenses" role="tab" data-toggle="tab"> <?=($TaxAtSourceCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Tax At Source") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.18")?>"><a href="#surcharge_other_expenses" role="tab" data-toggle="tab"> <?=($SurchargeOtherCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Surcharge and Other") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.19")?>"><a href="#loss_deductions_expenses" role="tab" data-toggle="tab"> <?=($LossDeductionsCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Loss, Deductions, Expenses") ?></a></li>
+
+      <li role="presentation" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.20")?>"><a href="#gift_donation_contribution" role="tab" data-toggle="tab"> <?=($GiftDonationContributionCount == 0) ? '':'<i class="fa fa-check-square"></i> ' ?> <?=Yii::t("expense","Gift, Donation, Contribution") ?></a></li>
+
+
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div class="back pull-right">
+       <a class="btn btn-success for-clr" href="<?=Yii::app()->baseUrl ?>/index.php/expenditure/review" ><span class="previous-text"> <?=Yii::t("common", "Review")?> </span><i class="glyphicon glyphicon-list-alt"></i></a>
+     </div>
+     
+<div role="tabpanel" class="tab-pane active" id="personal_food_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Personal and Food Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Personal or Food Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.1")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="personal_fooding_verification" style="display: <?=($model->PersonalFoodingConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any personal or food expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->PersonalFoodingConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('personal_fooding_verification', 'personal_fooding_fraction_or_total', 'personal_fooding_total')" type="button" class="btn btn-big btn-<?=($model->PersonalFoodingConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('PersonalFooding')" type="button" class="btn btn-big btn-<?=($model->PersonalFoodingConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="personal_fooding_fraction_or_total" style="display: <?=($model->PersonalFoodingConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="personal_fooding_total" style="display: <?=($model->PersonalFoodingFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->PersonalFoodingTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->PersonalFoodingTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('personal_fooding_total', 'personal_fooding_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your personal or food expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'PersonalFoodingTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Personal or Food Expenses")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4" style="margin-top: 10px">
+          <?php echo $form->textArea($model,'PersonalFoodingComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('PersonalFooding')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('PersonalFooding')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="personal_fooding_fraction" style="display: <?=($model->PersonalFoodingFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+
+
+
+
+  <table class="table" id="personal_fooding_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($PersonalFoodingList as $value) {
+        echo "<tr id='PersonalFooding_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpPersonalFooding\", \"personal_fooding\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpPersonalFooding\", \"PersonalFooding\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="personal_fooding_id">
+            <textarea id="personal_fooding_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="personal_fooding_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+        <tr>
+            <td  colspan="4" style="border: none !important;">
+                <div class="form-group">
+                    <?php echo $form->textField($model,'PersonalFoodingComment',array('id'=>'PersonalFoodingComment','name'=>'PersonalFoodingComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+                </div>
+            </td>
+        </tr>
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('personal_fooding_id', 'personal_fooding_description', 'personal_fooding_cost', 'ExpPersonalFooding', 'PersonalFooding','PersonalFoodingComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+  <div class="back pull-right">
+    <a class="btn btn-success for-clr" data-toggle="tab" href="#accommodation_expenses" onclick="next_pre('accommodation_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span><i class="fa fa-chevron-right"></i></a>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="total_tax_paid_last_year" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** TOTAL TAX PAID LAST YEAR ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Tax Paid Last Year")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.2")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="total_tax_paid_verification" style="display: <?=($model->TotalTaxPaidLastYearConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you paid tax of last year")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->TotalTaxPaidLastYearConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="hide_show('total_tax_paid_verification', 'total_tax_paid_total')" type="button" class="btn btn-big btn-<?=($model->TotalTaxPaidLastYearConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('TotalTaxPaidLastYear')" type="button" class="btn btn-big btn-<?=($model->TotalTaxPaidLastYearConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+ <!-- IF ANSWER IS "YES" SHOW THIS DIV" -->
+ <div id="total_tax_paid_total" style="display: <?=($model->TotalTaxPaidLastYearConfirm == 'Yes') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->TotalTaxPaidLastYear == "") ? "" : Yii::t("expense","Current value is") . " " .$model->TotalTaxPaidLastYear. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+ 
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your paid tax of last year")?></p>
+  <div class="col-sm-12">
+
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'TotalTaxPaidLastYear',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Tax Paid Last Year")) ); ?>
+    </div>
+
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'TotalTaxPaidLastYearComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('TotalTaxPaidLastYear')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('TotalTaxPaidLastYear')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF ANSWER IS "YES" SHOW THIS DIV" -->
+
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+  <div class="back pull-left">
+    <a class="btn btn-success for-clr" data-toggle="tab" href="#personal_food_expenses" onclick="next_pre('personal_food_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+  </div>
+  <div class="back pull-right">
+   <a class="btn btn-success for-clr" data-toggle="tab" href="#accommodation_expenses" onclick="next_pre('accommodation_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span><i class="fa fa-chevron-right"></i></a>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="accommodation_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Accommodation Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Accommodation Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.3")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="accommodation_verification" style="display: <?=($model->AccommodationConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any accommodation expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->AccommodationConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('accommodation_verification', 'accommodation_fraction_or_total', 'accommodation_total')" type="button" class="btn btn-big btn-<?=($model->AccommodationConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('Accommodation')" type="button" class="btn btn-big btn-<?=($model->AccommodationConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="accommodation_fraction_or_total" style="display: <?=($model->AccommodationConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="accommodation_total" style="display: <?=($model->AccommodationFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->AccommodationTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->AccommodationTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('accommodation_total', 'accommodation_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your accommodation expenses")?></p>
+  <div class="col-sm-12">
+
+
+
+
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'AccommodationTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Accommodation Expenses")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'AccommodationComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('Accommodation')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('Accommodation')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="accommodation_fraction" style="display: <?=($model->AccommodationFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+  <table class="table" id="accommodation_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($AccommodationList as $value) {
+        echo "<tr id='Accommodation_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpAccommodation\", \"accommodation\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpAccommodation\", \"Accommodation\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="accommodation_id">
+            <textarea id="accommodation_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="accommodation_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+
+      <tr>
+          <td  colspan="4" style="border: none !important;">
+              <div class="form-group">
+                  <?php echo $form->textField($model,'AccommodationComment',array('id'=>'AccommodationComment','name'=>'AccommodationComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('accommodation_id', 'accommodation_description', 'accommodation_cost', 'ExpAccommodation', 'Accommodation','AccommodationComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+  <div class="back pull-left">
+    <a class="btn btn-success for-clr" data-toggle="tab" href="#personal_food_expenses" onclick="next_pre('personal_food_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+  </div>
+  <div class="back pull-right">
+   <a class="btn btn-success for-clr" data-toggle="tab" href="#transportation_expenses" onclick="next_pre('transportation_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span><i class="fa fa-chevron-right"></i></a>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+
+<div role="tabpanel" class="tab-pane" id="transportation_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Transport Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Transport Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.4")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="transport_verification" style="display: <?=($model->TransportConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any Transport expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->TransportConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('transport_verification', 'transport_fraction_or_total', 'transport_total')" type="button" class="btn btn-big btn-<?=($model->TransportConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('Transport')" type="button" class="btn btn-big btn-<?=($model->TransportConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="transport_fraction_or_total" style="display: <?=($model->TransportConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="transport_total" style="display: <?=($model->TransportFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->TransportTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->TransportTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('transport_total', 'transport_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your Transport expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'TransportTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Transport Expenses")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'TransportComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('Transport')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('Transport')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="transport_fraction" style="display: <?=($model->TransportFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+  <table class="table" id="transport_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($TransportList as $value) {
+        echo "<tr id='transport_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpTransport\", \"transport\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpTransport\", \"Transport\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="transport_id">
+            <textarea id="transport_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="transport_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4" style="border: none !important;">
+              <div class="form-group">
+                  <?php echo $form->textField($model,'TransportComment',array('id'=>'TransportComment','name'=>'TransportComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('transport_id', 'transport_description', 'transport_cost', 'ExpTransport', 'Transport','TransportComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+  <div class="back pull-left">
+    <a class="btn btn-success for-clr" data-toggle="tab" href="#transport_expenses" onclick="next_pre('accommodation_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+  </div>
+  <div class="back pull-right">
+   <a class="btn btn-success for-clr" data-toggle="tab" href="#other_transportation_expenses" onclick="next_pre('other_transportation_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="other_transportation_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Other Transport Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Other Transport Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.12")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="other_transport_verification" style="display: <?=($model->OtherTransportConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any Other Transport expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->OtherTransportConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('other_transport_verification', 'other_transport_fraction_or_total', 'other_transport_total')" type="button" class="btn btn-big btn-<?=($model->OtherTransportConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('OtherTransport')" type="button" class="btn btn-big btn-<?=($model->OtherTransportConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="other_transport_fraction_or_total" style="display: <?=($model->OtherTransportConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="other_transport_total" style="display: <?=($model->OtherTransportFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->OtherTransportTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->OtherTransportTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('other_transport_total', 'other_transport_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your Transport expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'OtherTransportTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Other Transport Expenses")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'OtherTransportComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('OtherTransport')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('OtherTransport')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="other_transport_fraction" style="display: <?=($model->OtherTransportFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+  <table class="table" id="other_transport_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($OtherTransportList as $value) {
+        echo "<tr id='transport_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpOtherTransport\", \"other_transport\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpOtherTransport\", \"OtherTransport\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="other_transport_id">
+            <textarea id="other_transport_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="other_transport_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4" style="border: none !important;">
+              <div class="form-group">
+                  <?php echo $form->textField($model,'OtherTransportComment',array('id'=>'OtherTransportComment','name'=>'OtherTransportComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('other_transport_id', 'other_transport_description', 'other_transport_cost', 'ExpOtherTransport', 'OtherTransport','OtherTransportComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+  <div class="back pull-left">
+    <a class="btn btn-success for-clr" data-toggle="tab" href="#transportation_expenses" onclick="next_pre('transportation_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+  </div>
+  <div class="back pull-right">
+   <a class="btn btn-success for-clr" data-toggle="tab" href="#electricity_expenses" onclick="next_pre('electricity_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="electricity_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Electricity Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Electricity Bill")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.5")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="electricity_bill_verification" style="display: <?=($model->ElectricityBillConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any electricity bill")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->ElectricityBillConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('electricity_bill_verification', 'electricity_bill_fraction_or_total', 'electricity_bill_total')" type="button" class="btn btn-big btn-<?=($model->ElectricityBillConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('ElectricityBill')" type="button" class="btn btn-big btn-<?=($model->ElectricityBillConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="electricity_bill_fraction_or_total" style="display: <?=($model->ElectricityBillConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="electricity_bill_total" style="display: <?=($model->ElectricityBillFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->ElectricityBillTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->ElectricityBillTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('electricity_bill_total', 'electricity_bill_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your electricity bill")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'ElectricityBillTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Electricity Bill Expenses")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'ElectricityBillComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('ElectricityBill')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('ElectricityBill')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="electricity_bill_fraction" style="display: <?=($model->ElectricityBillFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+  <table class="table" id="electricity_bill_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($ElectricityBillList as $value) {
+        echo "<tr id='ExpElectricityBill_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpElectricityBill\", \"electricity_bill\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpElectricityBill\", \"ElectricityBill\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="electricity_bill_id">
+            <textarea id="electricity_bill_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="electricity_bill_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+
+      <tr>
+          <td  colspan="4"  style="border: none !important;">
+              <div class="form-group">
+                  <?php echo $form->textField($model,'ElectricityBillComment',array('id'=>'ElectricityBillComment','name'=>'ElectricityBillComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('electricity_bill_id', 'electricity_bill_description', 'electricity_bill_cost', 'ExpElectricityBill', 'ElectricityBill','ElectricityBillComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+  <div class="back pull-left">
+    <a class="btn btn-success for-clr" data-toggle="tab" href="#other_transportation_expenses" onclick="next_pre('other_transportation_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+  </div>
+  <div class="back pull-right">
+   <a class="btn btn-success for-clr" data-toggle="tab" href="#water_expenses" onclick="next_pre('water_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="water_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Water Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Water Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.6")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="wasa_bill_verification" style="display: <?=($model->WasaBillConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any wasa bill")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->WasaBillConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('wasa_bill_verification', 'wasa_bill_fraction_or_total', 'wasa_bill_total')" type="button" class="btn btn-big btn-<?=($model->WasaBillConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('WasaBill')" type="button" class="btn btn-big btn-<?=($model->WasaBillConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="wasa_bill_fraction_or_total" style="display: <?=($model->WasaBillConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="wasa_bill_total" style="display: <?=($model->WasaBillFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->WasaBillTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->WasaBillTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('wasa_bill_total', 'wasa_bill_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your wasa bill")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'WasaBillTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Wasa Bill Expenses")) ); ?>
+    </div>
+
+
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'WasaBillComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('WasaBill')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('WasaBill')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="wasa_bill_fraction" style="display: <?=($model->WasaBillFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="wasa_bill_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($WasaBillList as $value) {
+        echo "<tr id='ExpWasaBill_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpWasaBill\", \"wasa_bill\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpWasaBill\", \"WasaBill\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="wasa_bill_id">
+            <textarea id="wasa_bill_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="wasa_bill_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4"  style="border: none !important;">
+              <div class="form-group">
+                  <?php echo $form->textField($model,'WasaBillComment',array('id'=>'WasaBillComment','name'=>'WasaBillComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('wasa_bill_id', 'wasa_bill_description', 'wasa_bill_cost', 'ExpWasaBill', 'WasaBill','WasaBillComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+  <div class="back pull-left">
+    <a class="btn btn-success for-clr" data-toggle="tab" href="#electricity_expenses" onclick="next_pre('electricity_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+  </div>
+  <div class="back pull-right">
+   <a class="btn btn-success for-clr" data-toggle="tab" href="#gas_expenses" onclick="next_pre('gas_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+<div role="tabpanel" class="tab-pane" id="gas_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Water Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Gas Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.7")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="gas_bill_verification" style="display: <?=($model->GasBillConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any gas bill")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->GasBillConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('gas_bill_verification', 'gas_bill_fraction_or_total', 'gas_bill_total')" type="button" class="btn btn-big btn-<?=($model->GasBillConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('GasBill')" type="button" class="btn btn-big btn-<?=($model->GasBillConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="gas_bill_fraction_or_total" style="display: <?=($model->GasBillConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="gas_bill_total" style="display: <?=($model->GasBillFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->GasBillTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->GasBillTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('gas_bill_total', 'gas_bill_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your gas bill")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'GasBillTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Gas Bill Expenses")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'GasBillComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('GasBill')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('GasBill')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="gas_bill_fraction" style="display: <?=($model->GasBillFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+  <table class="table" id="gas_bill_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($GasBillList as $value) {
+        echo "<tr id='ExpGasBill_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpGasBill\", \"gas_bill\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpGasBill\", \"GasBill\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="gas_bill_id">
+            <textarea id="gas_bill_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="gas_bill_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4" style="border: none !important;">
+              <div class="form-group">
+                  <?php echo $form->textField($model,'GasBillComment',array('id'=>'GasBillComment','name'=>'GasBillComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('gas_bill_id', 'gas_bill_description', 'gas_bill_cost', 'ExpGasBill', 'GasBill','GasBillComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+  <div class="back pull-left">
+    <a class="btn btn-success for-clr" data-toggle="tab" href="#water_expenses" onclick="next_pre('water_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+  </div>
+  <div class="back pull-right">
+   <a class="btn btn-success for-clr" data-toggle="tab" href="#telephone_expenses" onclick="next_pre('telephone_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="telephone_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Telephone Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Telephone Bill")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.8")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="telephone_bill_verification" style="display: <?=($model->TelephoneBillConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any telephone bill")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->TelephoneBillConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('telephone_bill_verification', 'telephone_bill_fraction_or_total', 'telephone_bill_total')" type="button" class="btn btn-big btn-<?=($model->TelephoneBillConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('TelephoneBill')" type="button" class="btn btn-big btn-<?=($model->TelephoneBillConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="telephone_bill_fraction_or_total" style="display: <?=($model->TelephoneBillConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="telephone_bill_total" style="display: <?=($model->TelephoneBillFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->TelephoneBillTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->TelephoneBillTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('telephone_bill_total', 'telephone_bill_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your telephone bill")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'TelephoneBillTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Telephone Bill Expenses")) ); ?>
+    </div>
+
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'TelephoneBillComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('TelephoneBill')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('TelephoneBill')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="telephone_bill_fraction" style="display: <?=($model->TelephoneBillFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="telephone_bill_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($TelephoneBillList as $value) {
+        echo "<tr id='ExpTelephoneBill_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpTelephoneBill\", \"telephone_bill\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpTelephoneBill\", \"TelephoneBill\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="telephone_bill_id">
+            <textarea id="telephone_bill_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="telephone_bill_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4" style="border:none !important;">
+              <div class="form-group">
+                  <?php echo $form->textField($model,'TelephoneBillComment',array('id'=>'TelephoneBillComment','name'=>'TelephoneBillComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('telephone_bill_id', 'telephone_bill_description', 'telephone_bill_cost', 'ExpTelephoneBill', 'TelephoneBill','TelephoneBillComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+  <div class="back pull-left">
+    <a class="btn btn-success for-clr" data-toggle="tab" href="#gas_expenses" onclick="next_pre('gas_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+  </div>
+  <div class="back pull-right">
+   <a class="btn btn-success for-clr" data-toggle="tab" href="#other_household_expenses" onclick="next_pre('other_household_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+  </div>
+<div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+</div>
+
+<div role="tabpanel" class="tab-pane" id="other_household_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Other House Hold Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Other House Hold")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.13")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="other_household_verification" style="display: <?=($model->OtherHouseholdConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any other household expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->OtherHouseholdConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('other_household_verification', 'other_household_fraction_or_total', 'other_household_total')" type="button" class="btn btn-big btn-<?=($model->OtherHouseholdConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('OtherHousehold')" type="button" class="btn btn-big btn-<?=($model->OtherHouseholdConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="other_household_fraction_or_total" style="display: <?=($model->OtherHouseholdConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="other_household_total" style="display: <?=($model->OtherHouseholdFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->OtherHouseholdTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->OtherHouseholdTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('other_household_total', 'other_household_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your house hold expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'OtherHouseholdTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Other House Hold Expenses")) ); ?>
+    </div>
+
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'OtherHouseholdComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('OtherHousehold')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('OtherHousehold')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="other_household_fraction" style="display: <?=($model->OtherHouseholdFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="other_household_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($OtherHouseholdList as $value) {
+        echo "<tr id='ExpOtherHousehold_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpOtherHousehold\", \"other_household\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpOtherHousehold\", \"OtherHousehold\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="other_household_id">
+            <textarea id="other_household_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="other_household_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4" style="border:none !important;">
+              <div class="form-group">
+                  <?php echo $form->textField($model,'OtherHouseholdComment',array('id'=>'OtherHouseholdComment','name'=>'OtherHouseholdComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('other_household_id', 'other_household_description', 'other_household_cost', 'ExpOtherHousehold', 'OtherHousehold','OtherHouseholdComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+  <div class="back pull-left">
+    <a class="btn btn-success for-clr" data-toggle="tab" href="#telephone_expenses" onclick="next_pre('telephone_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+  </div>
+  <div class="back pull-right">
+   <a class="btn btn-success for-clr" data-toggle="tab" href="#child_edu_expenses" onclick="next_pre('child_edu_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+  </div>
+<div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+</div>
+
+<div role="tabpanel" class="tab-pane" id="child_edu_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Education Expenses for Children Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Education Expenses for Children")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.9")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="children_education_verification" style="display: <?=($model->ChildrenEducationConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any education expenses for children")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->ChildrenEducationConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('children_education_verification', 'children_education_fraction_or_total', 'children_education_total')" type="button" class="btn btn-big btn-<?=($model->ChildrenEducationConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('ChildrenEducation')" type="button" class="btn btn-big btn-<?=($model->ChildrenEducationConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="children_education_fraction_or_total" style="display: <?=($model->ChildrenEducationConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="children_education_total" style="display: <?=($model->ChildrenEducationFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->ChildrenEducationTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->ChildrenEducationTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('children_education_total', 'children_education_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your education expenses for children")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'ChildrenEducationTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Children Education Expenses")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'ChildrenEducationComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('ChildrenEducation')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('ChildrenEducation')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="children_education_fraction" style="display: <?=($model->ChildrenEducationFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+  <table class="table" id="children_education_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($ChildrenEducationList as $value) {
+        echo "<tr id='ExpChildrenEducation_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpChildrenEducation\", \"children_education\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpChildrenEducation\", \"ChildrenEducation\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="children_education_id">
+            <textarea id="children_education_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="children_education_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+          <td  colspan="4"  style="border: none !important;">
+              <div class="form-group">
+                  <?php echo $form->textField($model,'ChildrenEducationComment',array('id'=>'ChildrenEducationComment','name'=>'ChildrenEducationComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('children_education_id', 'children_education_description', 'children_education_cost', 'ExpChildrenEducation', 'ChildrenEducation','ChildrenEducationComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+    <div class="back pull-left">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#other_household_expenses" onclick="next_pre('other_household_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+    </div>
+    <div class="back pull-right">
+     <a class="btn btn-success for-clr" data-toggle="tab" href="#foreign_travel_expenses" onclick="next_pre('foreign_travel_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+    </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="foreign_travel_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Personal Foreign Travel Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Personal Foreign Travel Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.10")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="personal_foreign_travel_verification" style="display: <?=($model->PersonalForeignTravelConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any personal foreign travel expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->PersonalForeignTravelConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('personal_foreign_travel_verification', 'personal_foreign_travel_fraction_or_total', 'personal_foreign_travel_total')" type="button" class="btn btn-big btn-<?=($model->PersonalForeignTravelConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('PersonalForeignTravel')" type="button" class="btn btn-big btn-<?=($model->PersonalForeignTravelConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="personal_foreign_travel_fraction_or_total" style="display: <?=($model->PersonalForeignTravelConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="personal_foreign_travel_total" style="display: <?=($model->PersonalForeignTravelFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->PersonalForeignTravelTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->PersonalForeignTravelTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('personal_foreign_travel_total', 'personal_foreign_travel_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your personal foreign travel expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'PersonalForeignTravelTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Personal Foreign Travel Expenses")) ); ?>
+    </div>
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'PersonalForeignTravelComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('PersonalForeignTravel')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('PersonalForeignTravel')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="personal_foreign_travel_fraction" style="display: <?=($model->PersonalForeignTravelFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="personal_foreign_travel_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($PersonalForeignTravelList as $value) {
+        echo "<tr id='ExpPersonalForeignTravel_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpPersonalForeignTravel\", \"personal_foreign_travel\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpPersonalForeignTravel\", \"PersonalForeignTravel\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="personal_foreign_travel_id">
+            <textarea id="personal_foreign_travel_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="personal_foreign_travel_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4">
+              <div class="form-group">
+                  <?php echo $form->textArea($model,'PersonalForeignTravelComment',array('id'=>'PersonalForeignTravelComment','name'=>'PersonalForeignTravelComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('personal_foreign_travel_id', 'personal_foreign_travel_description', 'personal_foreign_travel_cost', 'ExpPersonalForeignTravel', 'PersonalForeignTravel','PersonalForeignTravelComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+    <div class="back pull-left">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#child_edu_expenses" onclick="next_pre('child_edu_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+    </div>
+    <div class="back pull-right">
+     <a class="btn btn-success for-clr" data-toggle="tab" href="#festival_other_expenses" onclick="next_pre('festival_other_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+    </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="festival_other_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Festival Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Festival Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.11")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="festival_other_special_verification" style="display: <?=($model->FestivalOtherSpecialConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any festival or other special expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->FestivalOtherSpecialConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('festival_other_special_verification', 'festival_other_special_fraction_or_total', 'festival_other_special_total')" type="button" class="btn btn-big btn-<?=($model->FestivalOtherSpecialConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('FestivalOtherSpecial')" type="button" class="btn btn-big btn-<?=($model->FestivalOtherSpecialConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="festival_other_special_fraction_or_total" style="display: <?=($model->FestivalOtherSpecialConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="festival_other_special_total" style="display: <?=($model->FestivalOtherSpecialFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->FestivalOtherSpecialTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->FestivalOtherSpecialTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('festival_other_special_total', 'festival_other_special_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your festival or other special expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'FestivalOtherSpecialTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Festival and Other Special Expenses")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'FestivalOtherSpecialComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('FestivalOtherSpecial')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('FestivalOtherSpecial')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="festival_other_special_fraction" style="display: <?=($model->FestivalOtherSpecialFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="festival_other_special_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($FestivalOtherSpecialList as $value) {
+        echo "<tr id='ExpFestivalOtherSpecial_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpFestivalOtherSpecial\", \"festival_other_special\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpFestivalOtherSpecial\", \"FestivalOtherSpecial\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="festival_other_special_id">
+            <textarea id="festival_other_special_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="festival_other_special_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4">
+              <div class="form-group">
+                  <?php echo $form->textArea($model,'FestivalOtherSpecialComment',array('id'=>'FestivalOtherSpecialComment','name'=>'FestivalOtherSpecialComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('festival_other_special_id', 'festival_other_special_description', 'festival_other_special_cost', 'ExpFestivalOtherSpecial', 'FestivalOtherSpecial','FestivalOtherSpecialComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+    <div class="back pull-left">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#foreign_travel_expenses" onclick="next_pre('child_edu_expenses')" ><i class="fa fa-chevron-left"></i><span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+    </div>
+    <div class="back pull-right">
+     <a class="btn btn-success for-clr" data-toggle="tab" href="#donation_expenses" onclick="next_pre('donation_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+    </div>
+  <div class="clearfix"></div>
+  </div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="donation_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Donation Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Donation Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.16")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="donation_verification" style="display: <?=($model->DonationConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any Donation expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->DonationConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('donation_verification', 'donation_fraction_or_total', 'donation_total')" type="button" class="btn btn-big btn-<?=($model->DonationConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('Donation')" type="button" class="btn btn-big btn-<?=($model->DonationConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="donation_fraction_or_total" style="display: <?=($model->DonationConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="donation_total" style="display: <?=($model->DonationFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->DonationTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->DonationTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('donation_total', 'donation_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your donation expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'DonationTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Donation")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'DonationComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('Donation')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('Donation')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="donation_fraction" style="display: <?=($model->DonationFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="donation_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($DonationList as $value) {
+        echo "<tr id='ExpDonation_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpDonation\", \"donation\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpDonation\", \"Donation\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="donation_id">
+            <textarea id="donation_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="donation_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4">
+              <div class="form-group">
+                  <?php echo $form->textArea($model,'DonationComment',array('id'=>'DonationComment','name'=>'DonationComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('donation_id', 'donation_description', 'donation_cost', 'ExpDonation', 'Donation','DonationComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+    <div class="back pull-left">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#festival_other_expenses" onclick="next_pre('festival_other_expenses')" ><i class="fa fa-chevron-left"></i><span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+    </div>
+    <div class="back pull-right">
+     <a class="btn btn-success for-clr" data-toggle="tab" href="#other_special_expenses" onclick="next_pre('other_special_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+    </div>
+  <div class="clearfix"></div>
+  </div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="other_special_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Other Special Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Other Special Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.17")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="other_special_verification" style="display: <?=($model->OtherSpecialConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any Other Special expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->OtherSpecialConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('other_special_verification', 'other_special_fraction_or_total', 'other_special_total')" type="button" class="btn btn-big btn-<?=($model->OtherSpecialConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('OtherSpecial')" type="button" class="btn btn-big btn-<?=($model->OtherSpecialConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="other_special_fraction_or_total" style="display: <?=($model->OtherSpecialConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="other_special_total" style="display: <?=($model->OtherSpecialFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->OtherSpecialTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->OtherSpecialTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('other_special_total', 'other_special_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your other special expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'OtherSpecialTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Other Special")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'OtherSpecialComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('OtherSpecial')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('OtherSpecial')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="other_special_fraction" style="display: <?=($model->OtherSpecialFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="other_special_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($OtherSpecialList as $value) {
+        echo "<tr id='ExpOtherSpecial_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpOtherSpecial\", \"other_special\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpOtherSpecial\", \"OtherSpecial\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="other_special_id">
+            <textarea id="other_special_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="other_special_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4">
+              <div class="form-group">
+                  <?php echo $form->textArea($model,'OtherSpecialComment',array('id'=>'OtherSpecialComment','name'=>'OtherSpecialComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('other_special_id', 'other_special_description', 'other_special_cost', 'ExpOtherSpecial', 'OtherSpecial','OtherSpecialComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+    <div class="back pull-left">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#donation_expenses" onclick="next_pre('donation_expenses')" ><i class="fa fa-chevron-left"></i><span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+    </div>
+    <div class="back pull-right">
+     <a class="btn btn-success for-clr" data-toggle="tab" href="#other_expenses" onclick="next_pre('other_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+    </div>
+  <div class="clearfix"></div>
+  </div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+
+
+<div role="tabpanel" class="tab-pane" id="other_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Other Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Other Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.17")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="other_verification" style="display: <?=($model->OtherConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any Other expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->OtherConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('other_verification', 'other_fraction_or_total', 'other_total')" type="button" class="btn btn-big btn-<?=($model->OtherConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('Other')" type="button" class="btn btn-big btn-<?=($model->OtherConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="other_fraction_or_total" style="display: <?=($model->OtherConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="other_total" style="display: <?=($model->OtherFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->OtherTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->OtherTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('other_total', 'other_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your other expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'OtherTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Other")) ); ?>
+    </div>
+
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'OtherComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('Other')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('Other')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="other_fraction" style="display: <?=($model->OtherFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="other_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($OtherList as $value) {
+        echo "<tr id='ExpOther_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpOther\", \"other\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpOther\", \"Other\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="other_id">
+            <textarea id="other_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="other_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4">
+              <div class="form-group">
+                  <?php echo $form->textArea($model,'OtherComment',array('id'=>'OtherComment','name'=>'OtherComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('other_id', 'other_description', 'other_cost', 'ExpOther', 'Other','OtherComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+    <div class="back pull-left">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#other_special_expenses" onclick="next_pre('other_special_expenses')" ><i class="fa fa-chevron-left"></i><span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+    </div>
+      <div class="back pull-right">
+       <a class="btn btn-success for-clr" data-toggle="tab" href="#tax_at_source_expenses" onclick="next_pre('tax_at_source_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+      </div>
+    <div class="clearfix"></div>
+  <div class="clearfix"></div>
+  </div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="tax_at_source_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Tax At Source Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Tax At Source Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.17")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="tax_at_source_verification" style="display: <?=($model->TaxAtSourceConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any Tax At Source expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->TaxAtSourceConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('tax_at_source_verification', 'tax_at_source_fraction_or_total', 'tax_at_source_total')" type="button" class="btn btn-big btn-<?=($model->TaxAtSourceConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('TaxAtSource')" type="button" class="btn btn-big btn-<?=($model->TaxAtSourceConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="tax_at_source_fraction_or_total" style="display: <?=($model->TaxAtSourceConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="tax_at_source_total" style="display: <?=($model->TaxAtSourceFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->TaxAtSourceTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->TaxAtSourceTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('tax_at_source_total', 'tax_at_source_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your tax at source expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'TaxAtSourceTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Tax At Source Expenses")) ); ?>
+    </div>
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'TaxAtSourceComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('TaxAtSource')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('TaxAtSource')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="tax_at_source_fraction" style="display: <?=($model->TaxAtSourceFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="tax_at_source_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($TaxAtSourceList as $value) {
+        echo "<tr id='ExpTaxAtSource_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpTaxAtSource\", \"tax_at_source\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpTaxAtSource\", \"TaxAtSource\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="tax_at_source_id">
+            <textarea id="tax_at_source_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="tax_at_source_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4">
+              <div class="form-group">
+                  <?php echo $form->textArea($model,'TaxAtSourceComment',array('id'=>'TaxAtSourceComment','name'=>'TaxAtSourceComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('tax_at_source_id', 'tax_at_source_description', 'tax_at_source_cost', 'ExpTaxAtSource', 'TaxAtSource','TaxAtSourceComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+    <div class="back pull-left">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#other_expenses" onclick="next_pre('other_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+    </div>
+    <div class="back pull-right">
+     <a class="btn btn-success for-clr" data-toggle="tab" href="#surcharge_other_expenses" onclick="next_pre('surcharge_other_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span> <i class="fa fa-chevron-right"></i></a>
+    </div>
+  <div class="clearfix"></div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="surcharge_other_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Surcharge and other Expenses ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Surcharge and others Expenses")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.18")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="surcharge_other_verification" style="display: <?=($model->SurchargeOtherConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any Surcharge and Other expenses")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->SurchargeOtherConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('surcharge_other_verification', 'surcharge_other_fraction_or_total', 'surcharge_other_total')" type="button" class="btn btn-big btn-<?=($model->SurchargeOtherConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('SurchargeOther')" type="button" class="btn btn-big btn-<?=($model->SurchargeOtherConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="surcharge_other_fraction_or_total" style="display: <?=($model->SurchargeOtherConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="surcharge_other_total" style="display: <?=($model->SurchargeOtherFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->SurchargeOtherTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->SurchargeOtherTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('surcharge_other_total', 'surcharge_other_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your surcharge and other expenses")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'SurchargeOtherTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Surcharge and Other Expenses")) ); ?>
+    </div>
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'SurchargeOtherComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('SurchargeOther')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('SurchargeOther')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="surcharge_other_fraction" style="display: <?=($model->SurchargeOtherFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="surcharge_other_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($SurchargeOtherList as $value) {
+        echo "<tr id='ExpSurchargeOther_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpSurchargeOther\", \"surcharge_other\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpSurchargeOther\", \"SurchargeOther\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="surcharge_other_id">
+            <textarea id="surcharge_other_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="surcharge_other_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4">
+              <div class="form-group">
+                  <?php echo $form->textArea($model,'SurchargeOtherComment',array('id'=>'SurchargeOtherComment','name'=>'SurchargeOtherComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('surcharge_other_id', 'surcharge_other_description', 'surcharge_other_cost', 'ExpSurchargeOther', 'SurchargeOther','SurchargeOtherComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+    <div class="back pull-left">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#tax_at_source_expenses" onclick="next_pre('tax_at_source_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+    </div>
+
+    <div class="back pull-right">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#loss_deductions_expenses" onclick="next_pre('loss_deductions_expenses')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span><i class="fa fa-chevron-right"></i></a>
+    </div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+<div role="tabpanel" class="tab-pane" id="loss_deductions_expenses" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Loss, deductions, expenses, etc. ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Loss, deductions, expenses, etc.")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.18")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="loss_deductions_verification" style="display: <?=($model->LossDeductionsConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any Loss, Deductions, Expenses, etc.")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->LossDeductionsConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('loss_deductions_verification', 'loss_deductions_fraction_or_total', 'loss_deductions_total')" type="button" class="btn btn-big btn-<?=($model->LossDeductionsConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('LossDeductions')" type="button" class="btn btn-big btn-<?=($model->LossDeductionsConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="loss_deductions_fraction_or_total" style="display: <?=($model->LossDeductionsConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <div id="loss_deductions_total" style="display: <?=($model->LossDeductionsFOrT != 'Fraction') ? 'block':'none' ?>;">
+
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->LossDeductionsTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->LossDeductionsTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('loss_deductions_total', 'loss_deductions_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your Loss, Deductions, Expenses, etc.")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'LossDeductionsTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Loss, Deductions, Expenses, etc.")) ); ?>
+    </div>
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'LossDeductionsComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('LossDeductions')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('LossDeductions')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="loss_deductions_fraction" style="display: <?=($model->LossDeductionsFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="loss_deductions_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($LossDeductionsList as $value) {
+        echo "<tr id='LossDeductions_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpLossDeductions\", \"loss_deductions\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpLossDeductions\", \"LossDeductions\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="loss_deductions_id">
+            <textarea id="loss_deductions_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="loss_deductions_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4">
+              <div class="form-group">
+                  <?php echo $form->textArea($model,'LossDeductionsComment',array('id'=>'LossDeductionsComment','name'=>'LossDeductionsComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('loss_deductions_id', 'loss_deductions_description', 'loss_deductions_cost', 'ExpLossDeductions', 'LossDeductions','LossDeductionsComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+    <div class="back pull-left">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#surcharge_other_expenses" onclick="next_pre('surcharge_other_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+    </div>
+
+    <div class="back pull-right">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#gift_donation_contribution" onclick="next_pre('gift_donation_contribution')" ><span class="previous-text"> <?=Yii::t("common","Next")?> </span><i class="fa fa-chevron-right"></i></a>
+    </div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+
+<div role="tabpanel" class="tab-pane" id="gift_donation_contribution" style="text-align: center !important;">
+<!-- 
+##############################################################################
+***************** Gift, donation and contribution ********************
+##############################################################################
+-->
+<h2><?=Yii::t("expense","Gift, donation and contribution")?>&nbsp;&nbsp;<i class="fa fa-question-circle fa-1" /*data-toggle="tooltip"*/ title="<?=Yii::t('TTips',"4.18")?>"></i></h2>                                   
+<div class="clearfix"></div>
+
+
+
+<!-- IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+<div id="gift_donation_contribution_verification" style="display: <?=($model->GiftDonationContributionConfirm == 'Yes') ? 'none':'block' ?>;">
+  <p>
+    <?=Yii::t("expense","Did you have any Gift, Donation and Contribution")?>? 
+  </p>
+  <?php
+        // IF THE ANSWER IS "NO"
+  if($model->GiftDonationContributionConfirm == 'No')
+    echo "<br>" . Yii::t("common","You chose No. If you want to change your answer, please select from below.");
+  ?>
+  <!-- YES/NO BUTTON -->
+  <h3>
+    <div class="btn-group btn-group-lg">
+      <button onclick="show_divs('gift_donation_contribution_verification', 'gift_donation_contribution_fraction_or_total', 'gift_donation_contribution_fraction')" type="button" class="btn btn-big btn-<?=($model->GiftDonationContributionConfirm == 'Yes')? 'success' : 'default' ?>"><?=Yii::t("common","YES")?></button>
+      <button onclick="set_no('GiftDonationContribution')" type="button" class="btn btn-big btn-<?=($model->GiftDonationContributionConfirm == 'No')? 'success' : 'default' ?>"><?=Yii::t("common","NO")?></button>
+    </div>
+  </h3>
+  <!-- END YES/NO BUTTON -->
+</div>
+<!-- END OF IF ANSWER IS "YES" HIDE THE QUESTION DIV -->
+
+<!-- IF THE ANSWER IS "YES", SHOW THIS DIV -->
+<div id="gift_donation_contribution_fraction_or_total" style="display: <?=($model->GiftDonationContributionConfirm == 'Yes') ? 'block':'none' ?>;">
+
+ <!-- IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+ <!-- <div id="gift_donation_contribution_total" style="display: <?=($model->GiftDonationContributionFOrT != 'Fraction') ? 'block':'none' ?>;"> -->
+  <div id="gift_donation_contribution_total" style="display: none;">
+  <!-- show saved data -->    
+  <p class="exp_alert">
+    <?=($model->GiftDonationContributionTotal == "") ? "" : Yii::t("expense","Current value is") . " " .$model->GiftDonationContributionTotal. ". " . Yii::t("expense","You can change the value below and press store")?>   
+  </p>
+  <!-- end - show saved data -->
+  <?=Yii::t("expense","You can enter total annual data below or you can breakdown your data")?>
+  <button onclick="show_divs('gift_donation_contribution_total', 'gift_donation_contribution_fraction', 'no')" type="button" class="btn btn-xs btn-success"><?=Yii::t("common","Breakdown")?></button>
+  
+  <!-- ENTRY FORM -->
+  <p><?=Yii::t("expense","Please enter your Gift, Donation and Contribution")?></p>
+  <div class="col-sm-12">
+    <div class="col-sm-4 col-sm-offset-4">
+      <?php echo $form->textField($model,'GiftDonationContributionTotal',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Gift, Donation and Contribution")) ); ?>
+    </div>
+      <div class="col-sm-4 col-sm-offset-4"  style="margin-top: 10px">
+          <?php echo $form->textArea($model,'GiftDonationContributionComment',array('class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+      </div>
+
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-danger glyphicon glyphicon-remove" onclick="delete_field_data('GiftDonationContribution')" type="button" ></button>
+    </div>
+  </div>
+  <p>
+    
+    <button style="margin-top: 10px;" class="btn btn-success btn-lg" onclick="save_expenditure('GiftDonationContribution')" type="button" ><?=Yii::t("common","Store")?></button>
+  </p>
+  <!-- END - ENTRY FORM -->
+
+</div>
+<!-- END - IF "TOTAL" OR NOTHING IS CHOSEN SHOW THIS DIV" -->
+
+<!-- IF "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+<div id="gift_donation_contribution_fraction" style="display: <?=($model->GiftDonationContributionFOrT == 'Fraction') ? 'block':'none' ?>;" class="col-sm-8 col-sm-offset-2">
+
+
+    <div class="col-sm-4 col-sm-offset-4">
+    </div>
+
+
+  <table class="table" id="gift_donation_contribution_table">
+    <thead>
+      <tr>
+        <th><?=Yii::t("expense","Description")?></th>
+        <th><?=Yii::t("expense","Value (BDT)")?></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+      foreach ($GiftDonationContributionList as $value) {
+        echo "<tr id='GiftDonationContribution_row_".$value->Id."'>";
+        echo "<td>".htmlentities(strip_tags($value->Description))."</td>";
+        echo "<td>".$value->Cost."</td>";
+        echo "<td><button type='button' class='btn btn-success glyphicon glyphicon-pencil' onclick='edit_exp(".$value->Id.", \"ExpGiftDonationContribution\", \"gift_donation_contribution\")'></button>";
+        echo "&nbsp;&nbsp;<button type='button' class='btn btn-danger glyphicon glyphicon-remove' onclick='delete_exp(".$value->Id.", \"ExpGiftDonationContribution\", \"GiftDonationContribution\")'></button></td>";
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+    <thead>
+      <tr>
+        <td>
+          <div class="form-group">
+            <input type="hidden" class="form-control" id="gift_donation_contribution_id">
+            <textarea id="gift_donation_contribution_description" class="form-control" rows="3" placeholder="<?=Yii::t("expense","Description (Please mention name of recipient)")?>"></textarea>
+          </div>
+        </td>
+        <td>
+          <div class="form-group">
+            <input type="text" class="form-control" id="gift_donation_contribution_cost" placeholder="<?=Yii::t("expense","Value")?>">
+          </div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+
+      <tr>
+          <td  colspan="4">
+              <div class="form-group">
+                  <?php echo $form->textArea($model,'GiftDonationContributionComment',array('id'=>'GiftDonationContributionComment','name'=>'GiftDonationContributionComment','class'=>'form-control', 'placeholder'=>Yii::t("expense","Comment")) ); ?>
+
+              </div>
+          </td>
+      </tr>
+
+
+    </thead>  
+  </table>
+  <!-- SAVE BUTTON FOR FRACTION ENTRY -->
+  
+  <button class="btn btn-success btn-lg" onclick="save_expenditure_fraction('gift_donation_contribution_id', 'gift_donation_contribution_description', 'gift_donation_contribution_cost', 'ExpGiftDonationContribution', 'GiftDonationContribution','GiftDonationContributionComment')" type="button" ><?=Yii::t("common","Store")?></button>
+  
+  <!-- END - SAVE BUTTON FOR FRACTION ENTRY -->
+</div>
+<!-- END - "FRACTION" IS CHOSEN SHOW THIS DIV" -->
+
+</div>
+
+<!-- NEXT PREVIOUS BUTTON -->
+<div class="login-button input-group">
+    <div class="back pull-left">
+      <a class="btn btn-success for-clr" data-toggle="tab" href="#loss_deductions_expenses" onclick="next_pre('loss_deductions_expenses')" ><i class="fa fa-chevron-left"></i> <span class="previous-text">  <?=Yii::t("common","Previous")?> </span></a>
+    </div>
+
+    <div class="back pull-right">
+        <a class="btn btn-success for-clr" href="<?=Yii::app()->baseUrl ?>/index.php/expenditure/review"><span class="previous-text"><?=Yii::t("income","Next")?></span> <i class="fa fa-chevron-right"></i></a>
+    </div>
+</div>
+<!-- END - NEXT PREVIOUS BUTTON -->
+
+</div>
+
+
+
+
+</div>
+</div>
+</div>
+
+<?php $this->endWidget(); ?>

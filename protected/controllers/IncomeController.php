@@ -1,0 +1,2473 @@
+<?php
+
+class IncomeController extends Controller
+{
+/**
+* @var string the default layout for the views. Defaults to '//layouts/column2', meaning
+* using two-column layout. See 'protected/views/layouts/column2.php'.
+*/
+public $layout='//layouts/columnLess';
+public $defaultAction = 'startup';
+/**
+* @return array action filters
+*/
+public function filters()
+{
+	return array(
+'accessControl', // perform access control for CRUD operations
+);
+}
+
+/**
+* Specifies the access control rules.
+* This method is used by the 'accessControl' filter.
+* @return array access control rules
+*/
+public function accessRules() {
+	return array(
+            array('allow', // allow authenticated user to perform 'create' and 'update' actions
+            	'actions' => array('index', 'admin', 'entry', 'startup', 'pIDetails1', 'pIDetails2', 'pIDetails2', 'SaveInfo', 'review', 'setNo', 'saveFrcOfSecurities', 'saveFrcOfAgriculture', 'saveFrcOfBusinessOrProfession', 'saveFrcOfShareProfit', 'saveFrcOfSpouseOrChild', 'saveFrcOfCapitalGains', 'saveFrcOfOtherSource', 'saveFrcOfForeignIncome', 'getDataForEdit', 'deleteData', 'deleteParticularFieldData', 'totalOutput', 'linkTest','saveFrcOfIncomeTaxDeductedSource','saveFrcOfIncomeTaxInAdvance','getBusinessDetails','deleteBusinessDetails','copyLastyear'),
+            	'users' => array('@'),
+            	'expression' => '(Yii::app()->user->role==="superAdmin")||(Yii::app()->user->role==="customers")||(Yii::app()->user->role==="companyUser")||(Yii::app()->user->role==="companyAdmin")',
+            	),
+            array('deny', // deny all users
+            	'users' => array('*'),
+            	),
+            );
+}
+
+/**
+* Displays Startup page if no data entered on that year.
+*/
+public function actionStartup()
+{
+
+	$isNew = Income::model()->count('CPIId=:data AND EntryYear=:data2',array(':data'=>Yii::app()->user->CPIId, ':data2'=>$this->taxYear() ));
+
+	if ($isNew>=1) {
+
+		$this->redirect(array('entry#s_7'));
+	} else {
+
+		$last_tax_year = $this->lastTaxYear();
+
+		$this->render('startup',array(
+			'last_tax_year' => $last_tax_year,
+			));
+	}
+}
+
+
+
+/**
+* Displays a particular model.
+* @param integer $id the ID of the model to be displayed
+*/
+public function actionView($id)
+{
+	$this->render('view',array(
+		'model'=>$this->loadModel($id),
+		));
+}
+
+/**
+* Creates a new model.
+* If creation is successful, the browser will be redirected to the 'view' page.
+*/
+
+public function actionCreate()
+{
+	$model=new Income;
+
+// Uncomment the following line if AJAX validation is needed
+// $this->performAjaxValidation($model);
+
+	if(isset($_POST['Income']))
+	{
+		$model->attributes=$_POST['Income'];
+		if($model->save())
+			$this->redirect(array('view','id'=>$model->IncomeId));
+	}
+
+	$this->render('create',array(
+		'model'=>$model,
+		));
+}
+
+
+public function actionEntry()
+{
+	$isNew = Income::model()->count('CPIId=:data AND EntryYear=:data2',array(':data'=>Yii::app()->user->CPIId, ':data2'=>$this->taxYear() ));
+	if(empty($isNew)){
+		$modelNew=new Income;
+		$modelNew->CPIId=Yii::app()->user->CPIId;
+		$modelNew->EntryYear=$this->taxYear();
+		$modelNew->save(false);
+	}
+	$model=$this->loadModelByCPIId(Yii::app()->user->CPIId);
+	// $model=$this->Income::model()->find('CPIId=:data AND EntryYear=:data2',array(':data'=>Yii::app()->user->CPIId, ':data2'=>$this->taxYear() ));
+
+	$CalculationModel = CalculationDataSource::model()->find('EntryYear=:data', array(':data' => $this->taxYear()));
+	$model2 = IncIncomeOtherSource::model()->find('IncomeId=:data', array(':data' => $model->IncomeId));
+	$model3 = IncIncomeBusinessOrProfession::model()->find('IncomeId=:data', array(':data' => $model->IncomeId));
+	$model4 = IncIncomeBusinessOrProfessionDetails::model()->find('IncomeId=:data', array(':data' => $model->IncomeId));
+
+	
+	if (empty($model2)) {
+		$model2 = new IncIncomeOtherSource;
+	}
+	if (empty($model3)) {
+		$model3 = new IncIncomeBusinessOrProfession;
+	}
+	if (empty($model4)) {
+		$model4 = new IncIncomeBusinessOrProfessionDetails;
+	}
+
+
+
+	if ( !isset($model->CPIId) || $model->CPIId==null ) {
+
+		$this->redirect(array('startup'));
+
+	} else {
+
+		// $this->redirect(array('entry#s_7'));
+
+		$this->render('income',array(
+			'model'=>$model,
+			'CalculationModel'=>$CalculationModel,
+			'model2'=>$model2,
+			'model3'=>$model3,
+			'model4'=>$model4
+			));
+
+		// $model=$this->loadModelByCPIId(Yii::app()->user->CPIId);
+	}
+
+
+}
+
+
+
+
+public function actionReview()
+{
+
+
+    $CalculationModel = CalculationDataSource::model()->find('EntryYear=:data',array(':data'=>$this->taxYear() ));
+
+
+	$model=$this->loadModelByCPIId(Yii::app()->user->CPIId);
+
+
+	if ( !isset($model->CPIId) || $model->CPIId==null ) {
+
+		$this->redirect(array('startup'));
+
+	} else {
+
+		$this->render('review',array(
+			'model'=>$model,
+			'CalculationModel'=>$CalculationModel
+
+			));
+
+		// $model=$this->loadModelByCPIId(Yii::app()->user->CPIId);
+	}
+
+
+}
+
+
+/**
+* Updates a particular model.
+* If update is successful, the browser will be redirected to the 'view' page.
+* @param integer $id the ID of the model to be updated
+*/
+public function actionUpdate($id)
+{
+	$model=$this->loadModel($id);
+
+// Uncomment the following line if AJAX validation is needed
+// $this->performAjaxValidation($model);
+
+	if(isset($_POST['Income']))
+	{
+		$model->attributes=$_POST['Income'];
+		$model->LastUpdateAt=date('Y-m-d G:i:s');
+		if($model->save())
+			$this->redirect(array('view','id'=>$model->IncomeId));
+	}
+
+	$this->render('update',array(
+		'model'=>$model,
+		));
+}
+
+/**
+* Deletes a particular model.
+* If deletion is successful, the browser will be redirected to the 'admin' page.
+* @param integer $id the ID of the model to be deleted
+*/
+public function actionDelete($id)
+{
+	if(Yii::app()->request->isPostRequest)
+	{
+// we only allow deletion via POST request
+		$this->loadModel($id)->delete();
+
+// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+		if(!isset($_GET['ajax']))
+			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+	}
+	else
+		throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
+}
+
+
+/**
+* Manages all models.
+*/
+public function actionAdmin()
+{
+	$model=new Income('search');
+$model->unsetAttributes();  // clear any default values
+if(isset($_GET['Income']))
+	$model->attributes=$_GET['Income'];
+
+$this->render('admin',array(
+	'model'=>$model,
+	));
+}
+
+/**
+* Returns the data model based on the primary key given in the GET variable.
+* If the data model is not found, an HTTP exception will be raised.
+* @param integer the ID of the model to be loaded
+*/
+public function loadModel($id)
+{
+	$model=Income::model()->findByPk($id);
+	if($model===null)
+		throw new CHttpException(404,'There is no list with this id.');
+	return $model;
+}
+
+
+public function loadModelByCPIId($id)
+{
+	$model=Income::model()->find('CPIId=:data AND EntryYear=:data2',array(':data'=>$id, ':data2'=>$this->taxYear() ) );
+	// if($model===null)
+	// 	throw new CHttpException(404,'There is no list with this id.');
+	return $model;
+}
+
+/**
+* Performs the AJAX validation.
+* @param CModel the model to be validated
+*/
+protected function performAjaxValidation($model)
+{
+	if(isset($_POST['ajax']) && $_POST['ajax']==='income-form')
+	{
+		echo CActiveForm::validate($model);
+		Yii::app()->end();
+	}
+}
+
+public function actionSaveInfo()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+		if($_POST['value'] != "" && !is_numeric($_POST['value']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = "Data must be a number";
+			die(json_encode($data));
+		}
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = "No data found";
+			die(json_encode($data));
+		}
+	}
+
+	$model=new Income;
+	
+####################### UPDATE ##########################
+	$model->updateByPk($_POST['IncomeId'], array(
+		$_POST['field_name']."Confirm" => "Yes",		
+		$_POST['field_name']."FOrT" => "Total",
+		$_POST['field_name'] => $_POST['value'],
+		'LastUpdateAt' => date("Y-m-d H:i:s")
+		));
+
+
+	$model=Income::model()->findByPk($_POST['IncomeId']);
+	$data['value'] = $model->{$_POST['field_name']};
+	
+	
+	/*	$data['status'] = "success";
+		$data['msg'] = "Successfully Stored " . $data['value'] . ". You can change the value bellow and press Store.";
+		echo json_encode($data);*/
+
+
+ 		$data['status'] = "success";
+		$data['msg'] = Yii::t("assets","Successfully Set to No");
+		Yii::app()->user->setFlash('alert_success', Yii::t("assets","Successfully Stored"));
+		echo json_encode($data);
+
+}
+
+function checkActiveInactive($model, $confirm, $FOrT, $model2, $total) { 
+//$model, InterestOnSecuritiesConfirm, InterestOnSecuritiesFOrT, IncInterestOnSecurities, InterestOnSecurities//
+	$isAnswered = 0;
+	if($model->$confirm == null) {
+        //blank
+	}
+	elseif($model->$confirm == "No") {
+		$isAnswered = 1;
+	}
+	elseif($model->$confirm == "Yes") {
+		if($model->$FOrT == "Fraction") {
+			$counter = $model2::model()->count('IncomeId=:data',array(':data'=>$model->IncomeId));
+			if($counter > 0) $isAnswered = 1;
+		}
+		elseif($model->$FOrT == "Total") {
+			if($model->$total != null) $isAnswered = 1;
+		} 
+	}
+	return $isAnswered;
+}
+
+function checkActiveInactive2($model, $confirm) { 
+
+	$isAnswered = 0;
+	if($model->$confirm == null) {
+        //blank
+	}
+	elseif($model->$confirm == "No") {
+		$isAnswered = 1;
+	}
+	elseif($model->$confirm == "Yes") {
+		 $isAnswered = 1;
+	}
+	return $isAnswered;
+}
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+public function ActionSetNo() {
+	$model2=new Income;
+	$model2->updateByPk($_POST['IncomeId'], array(
+		$_POST['field']."Confirm" => "No",
+		$_POST['field']."FOrT" => null,
+		$_POST['field'] => null,
+		'LastUpdateAt' => date("Y-m-d H:i:s")
+		));
+	$data['status'] = "success";
+	$data['msg'] = Yii::t("income","Successfully Set to No");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Set to No"));
+	echo json_encode($data);
+}
+
+
+
+public function ActionSaveFractionInfo()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+		if($_POST['cost'] != "" && !is_numeric($_POST['cost']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Cost must be a number");
+			die(json_encode($data));
+		}
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+	}
+	if($_POST['id'] == "")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+		$_POST['d']['IncomeId'] = $_POST['IncomeId'];
+		$_POST['d']['Description'] = $_POST['description'];
+		$_POST['d']['Cost'] = $_POST['cost'];
+		$_POST['d']['CerateAt'] = date("Y-m-d H:i:s");
+		$model->attributes=$_POST['d'];
+		$model->save();
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['id'], array(
+			'Description' => $_POST['description'],
+			'Cost' => $_POST['cost'],
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+
+
+public function ActionSaveFrcOfSecurities()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+
+
+		
+		if($_POST['IncInterestOnSecurities_Type'] == "" )
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Type can not be empty");
+			die(json_encode($data));
+		}
+		
+		if($_POST['IncInterestOnSecurities_NetAmount'] == "" || !is_numeric($_POST['IncInterestOnSecurities_NetAmount']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Amount must be a number");
+			die(json_encode($data));
+		}
+		// die("die here");
+		
+		if($_POST['IncInterestOnSecurities_CommissionOrInterest'] == "" || !is_numeric($_POST['IncInterestOnSecurities_CommissionOrInterest']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Commission/Interest must be a number");
+			die(json_encode($data));
+		}
+
+		if($_POST['IncInterestOnSecurities_Cost'] == "" || !is_numeric($_POST['IncInterestOnSecurities_Cost']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Cost must be a number");
+			die(json_encode($data));
+		}
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+	}
+
+	if($_POST['InterestOnSecuritiesId'] == "notSet")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		$model->Type 					= $_POST['IncInterestOnSecurities_Type'];
+		$model->Description 			= $_POST['IncInterestOnSecurities_Description'];
+		$model->NetAmount 				= $_POST['IncInterestOnSecurities_NetAmount'];
+		$model->CommissionOrInterest 	= $_POST['IncInterestOnSecurities_CommissionOrInterest'];
+		$model->Cost 					= $_POST['IncInterestOnSecurities_Cost'];
+		$model->IncomeId 				= $_POST['IncomeId'];
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		// $data = $_POST['IncInterestOnSecurities'];
+
+		// foreach ($data as $key => $value) {
+
+		// 	if(isset($value)) { $model->$key = $value; }
+
+		// }
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%|><><><><><><><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['InterestOnSecuritiesId'], array(
+			'Type' 					=> $_POST['IncInterestOnSecurities_Type'],
+			'Description' 			=> $_POST['IncInterestOnSecurities_Description'],
+			'NetAmount' 			=> $_POST['IncInterestOnSecurities_NetAmount'],
+			'CommissionOrInterest' 	=> $_POST['IncInterestOnSecurities_CommissionOrInterest'],
+			'Cost' 					=> $_POST['IncInterestOnSecurities_Cost'],
+			'IncomeId' 				=> $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+
+
+public function ActionSaveFrcOfAgriculture()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{	
+		if($_POST['BooksOfAccount'] == "notSet" )
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Please select Books Of Account");
+			die(json_encode($data));
+		}
+
+		if($_POST['IncIncomeAgriculture_LandInBigha'] == "" )
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Land can not be empty");
+			die(json_encode($data));
+		}
+		
+		if($_POST['IncIncomeAgriculture_TotalRevenue'] == "" || !is_numeric($_POST['IncIncomeAgriculture_TotalRevenue']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Total revenue must be a number");
+			die(json_encode($data));
+		}
+		// die("die here");
+		
+		if($_POST['IncIncomeAgriculture_ProductionCost'] == "" || !is_numeric($_POST['IncIncomeAgriculture_ProductionCost']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Production cost must be a number");
+			die(json_encode($data));
+		}
+
+		if($_POST['IncIncomeAgriculture_Cost'] == "" || !is_numeric($_POST['IncIncomeAgriculture_Cost']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Cost must be a number");
+			die(json_encode($data));
+		}
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+	}
+
+	if($_POST['IncomeAgricultureId'] == "notSet")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		$model->LandInBigha 			= $_POST['IncIncomeAgriculture_LandInBigha'];
+		$model->CropsType 				= $_POST['IncIncomeAgriculture_CropsType'];
+		$model->TotalRevenue 			= $_POST['IncIncomeAgriculture_TotalRevenue'];
+		$model->BooksOfAccount 			= $_POST['BooksOfAccount'];
+		$model->ProductionCost 			= $_POST['IncIncomeAgriculture_ProductionCost'];
+		$model->Cost 					= $_POST['IncIncomeAgriculture_Cost'];
+		$model->IncomeId 				= $_POST['IncomeId'];
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		// $data = $_POST['IncomeAgriculture'];
+
+		// foreach ($data as $key => $value) {
+
+		// 	if(isset($value)) { $model->$key = $value; }
+
+		// }
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%|><><><><><><><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			//$_POST['field_name']."BooksOfAccount" => $_POST['BookOfAccountS'],
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['IncomeAgricultureId'], array(
+			'LandInBigha' 					=> $_POST['IncIncomeAgriculture_LandInBigha'],
+			'CropsType' 			=> $_POST['IncIncomeAgriculture_CropsType'],
+			'TotalRevenue' 			=> $_POST['IncIncomeAgriculture_TotalRevenue'],
+			'BooksOfAccount' 			=> $_POST['BooksOfAccount'],
+			'ProductionCost' 	=> $_POST['IncIncomeAgriculture_ProductionCost'],
+			'Cost' 					=> $_POST['IncIncomeAgriculture_Cost'],
+			'IncomeId' 				=> $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+
+
+public function ActionGetBusinessDetails(){
+	// $criteria = new CDbCriteria();
+	// $criteria->addColumnCondition(array('Type' => $_POST['Type'], 'IncomeId' => $_POST['IncomeId']));
+
+	// $incomeBusinessOrProfessionDetails = IncIncomeBusinessOrProfessionDetails::model()->find('IncomeId=:data AND Type=:data1', array(':data'=>@$_POST['IncomeId'], ':data1'=>@$_POST['Type']));
+	$incomeBusinessOrProfessionDetails = Yii::app()->db->createCommand()
+											->from('inc_income_business_or_profession_details')
+											->where('IncomeId=:data', array(':data'=>$_POST['IncomeId']))
+											->andWhere('Type=:data1', array(':data1'=>$_POST['Type']))
+											->queryRow();
+
+											// var_dump($incomeBusinessOrProfessionDetails);die;
+	// $incomeBusinessOrProfessionDetails = IncIncomeBusinessOrProfessionDetails::model()->find($criteria);
+// var_dump($incomeBusinessOrProfessionDetails);die;
+	echo json_encode($incomeBusinessOrProfessionDetails);	
+}
+
+
+public function ActiondeleteBusinessDetails(){
+	if(isset($_POST['IncomeId'])){
+
+		$iBDetails = Yii::app()->db->createCommand()
+											->from('inc_income_business_or_profession_details')
+											->where('IncomeId=:data', array(':data'=>$_POST['IncomeId']))
+											->andWhere('Type=:data1', array(':data1'=>$_POST['Type']))
+											->queryRow();
+											//echo $iBDetails['IncomeBusinessOrProfessionDetailsId'];
+
+
+        if($iBDetails){
+	        $data = IncIncomeBusinessOrProfessionDetails::model()->findByPk($iBDetails['IncomeBusinessOrProfessionDetailsId']);
+	        $data->delete();
+
+			$model3 = IncIncomeBusinessOrProfession::model()->find('IncomeId=:data', array(':data' => $_POST['IncomeId']));
+
+			$type2 =  ucfirst($_POST['Type'].'_1');
+			$type1 =  ucfirst($_POST['Type']);
+			$cost = $model3->Cost;
+			$TotalAmountIncome = $model3->TotalAmountIncome;
+			$TotalAmountIncome = $TotalAmountIncome - $model3->$type2;
+			$cost = $cost-$model3->$type1;
+			$model3->Cost = $cost;
+			$model3->TotalAmountIncome = $TotalAmountIncome;
+			$model3->$type2 = 0;
+			$model3->$type1 = 0;
+	        $model3->save(false);
+    	}
+
+        
+
+    }
+		
+}
+
+public function ActionSaveFrcOfBusinessOrProfession(){
+	// var_dump($_POST);die;
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+		// if($_POST['Type']=='ExportBusiness'){
+		// 	$_POST['ExportBusiness_1'] = $this->checkNumeric($_POST['temp_Amount']);
+		// 	$_POST['ExportBusiness'] = $this->checkNumeric($_POST['temp_NetTaxable']);
+		// }
+		// elseif($_POST['Type']=='HandCraftedMaterials'){
+		// 	$_POST['HandCraftedMaterials_1'] = $this->checkNumeric($_POST['HandCraftedMaterials_1']);
+		// 	$_POST['HandCraftedMaterials'] = $this->checkNumeric($_POST['HandCraftedMaterials']);
+		// }
+		// elseif($_POST['Type']=='BusinessOfSoftwareDevelopment'){
+		// 	$_POST['BusinessOfSoftwareDevelopment_1'] = $this->checkNumeric($_POST['BusinessOfSoftwareDevelopment_1']);
+		// 	$_POST['BusinessOfSoftwareDevelopment'] = $this->checkNumeric($_POST['BusinessOfSoftwareDevelopment']);
+		// }
+		// elseif($_POST['Type']=='NTTN'){
+		// 	$_POST['NTTN_1'] = $this->checkNumeric($_POST['NTTN_1']);
+		// 	$_POST['NTTN'] = $this->checkNumeric($_POST['NTTN']);
+		// }
+		// elseif($_POST['Type']=='ITES'){
+		// 	$_POST['ITES_1'] = $this->checkNumeric($_POST['ITES_1']);
+		// 	$_POST['ITES'] = $this->checkNumeric($_POST['ITES']);
+		// }
+		// elseif($_POST['Type']=='PoultryFarm'){
+		// 	$_POST['PoultryFarm_1'] = $this->checkNumeric($_POST['PoultryFarm_1']);
+		// 	$_POST['PoultryFarm'] = $this->checkNumeric($_POST['PoultryFarm']);
+		// }
+		// elseif($_POST['Type']=='SmallMediumEnterprise'){
+		// 	$_POST['AnnualTurnover'] = $this->checkNumeric($_POST['AnnualTurnover']); 
+			
+		// 	$_POST['SmallMediumEnterprise_1'] = $this->checkNumeric($_POST['SmallMediumEnterprise_1']);
+		// 	$_POST['SmallMediumEnterprise'] = $this->checkNumeric($_POST['SmallMediumEnterprise']);
+
+		// }
+		// elseif($_POST['Type']=='Others'){
+		// 	$_POST['Others_1'] = $this->checkNumeric($_POST['Others_1']);
+		// 	$_POST['Others'] = $this->checkNumeric($_POST['Others']);
+		// }
+		if($_POST['Type']=='IncomeFromBusiness1'){
+			$_POST['IncomeFromBusiness1_1'] = $this->checkNumeric($_POST['IncomeFromBusiness1_1']);
+			$_POST['IncomeFromBusiness1'] = $this->checkNumeric($_POST['IncomeFromBusiness1']);
+		}
+		elseif($_POST['Type']=='IncomeFromBusiness2'){
+			$_POST['IncomeFromBusiness2_1'] = $this->checkNumeric($_POST['IncomeFromBusiness2_1']);
+			$_POST['IncomeFromBusiness2'] = $this->checkNumeric($_POST['IncomeFromBusiness2']);
+		}
+		elseif($_POST['Type']=='IncomeFromBusiness3'){
+			$_POST['IncomeFromBusiness3_1'] = $this->checkNumeric($_POST['IncomeFromBusiness3_1']);
+			$_POST['IncomeFromBusiness3'] = $this->checkNumeric($_POST['IncomeFromBusiness3']);
+		}
+
+		//Sum of total amount income
+		// $TotalAmountIncome = $_POST['ExportBusiness_1'] + $_POST['HandCraftedMaterials_1'] + $_POST['BusinessOfSoftwareDevelopment_1'] + $_POST['NTTN_1'] + $_POST['ITES_1'] + $_POST['PoultryFarm_1'] + $_POST['SmallMediumEnterprise_1'] + $_POST['Others_1'] + $_POST['IncomeFromBusiness1_1'] + $_POST['IncomeFromBusiness2_1'] + $_POST['IncomeFromBusiness3_1'];
+		$TotalAmountIncome = $_POST['IncomeFromBusiness1_1'] + $_POST['IncomeFromBusiness2_1'] + $_POST['IncomeFromBusiness3_1'] ;
+		//Sum of taxable income
+		// $Cost = $_POST['ExportBusiness'] + $_POST['HandCraftedMaterials'] + $_POST['BusinessOfSoftwareDevelopment'] + $_POST['NTTN'] + $_POST['ITES'] + $_POST['PoultryFarm'] + $_POST['SmallMediumEnterprise'] + $_POST['Others'] + $_POST['IncomeFromBusiness1'] + $_POST['IncomeFromBusiness2'] + $_POST['IncomeFromBusiness3'];
+		$Cost = $_POST['IncomeFromBusiness1'] + $_POST['IncomeFromBusiness2'] + $_POST['IncomeFromBusiness3'];
+
+
+
+		// $_POST['Type'] = $this->checkNumeric($_POST['Others']);
+		// $_POST['BusinessOrProfessionName'] = $this->checkNumeric($_POST['Others']);
+		// $_POST['Address'] = $this->checkNumeric($_POST['Others']);
+		$_POST['Sales'] = $this->checkNumeric($_POST['Sales']);
+		$_POST['GrossProfit'] = $this->checkNumeric($_POST['GrossProfit']);
+		$_POST['OtherExpense'] = $this->checkNumeric($_POST['OtherExpense']);
+		$_POST['NetProfit'] = $this->checkNumeric($_POST['NetProfit']);
+		$_POST['CashInHandOrBank'] = $this->checkNumeric($_POST['CashInHandOrBank']);
+		$_POST['Inventories'] = $this->checkNumeric($_POST['Inventories']);
+		$_POST['FixedAssets'] = $this->checkNumeric($_POST['FixedAssets']);
+		$_POST['OtherAssets'] = $this->checkNumeric($_POST['OtherAssets']);
+		$_POST['TotalAssets'] = $this->checkNumeric($_POST['TotalAssets']);
+		$_POST['OpeningCapital'] = $this->checkNumeric($_POST['OpeningCapital']);
+		$_POST['WithdrawlsInIncomeYear'] = $this->checkNumeric($_POST['WithdrawlsInIncomeYear']);
+		$_POST['ClosingCapital'] = $this->checkNumeric($_POST['ClosingCapital']);
+		$_POST['Liabilities'] = $this->checkNumeric($_POST['Liabilities']);
+		$_POST['TotalCapitalLiabilities'] = $this->checkNumeric($_POST['TotalCapitalLiabilities']);
+		$_POST['BusinessIncomeExempted'] = $_POST['BusinessIncomeExempted'];
+
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+		$isNewIncomeBusinessOrProfessionDetails = IncIncomeBusinessOrProfessionDetails::model()->findAll('IncomeId=:data AND Type=:data1', array(':data'=>@$_POST['IncomeId'], ':data1'=>@$_POST['Type']));
+		$isNewIncomeBusinessOrProfession = IncIncomeBusinessOrProfession::model()->findAll('IncomeId=:data', array(':data'=>@$_POST['IncomeId']));
+
+		// var_dump($isNewIncomeBusinessOrProfessionDetails);die;
+	}
+
+	if(empty($isNewIncomeBusinessOrProfession)){
+
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		// if($_POST['Type']=='ExportBusiness'){
+		// 	$model->ExportBusiness_1 = $_POST['temp_Amount'];
+		// 	$model->ExportBusiness = $_POST['temp_NetTaxable'];
+		// }
+		// if($_POST['Type']=='HandCraftedMaterials'){
+		// $model->HandCraftedMaterials_1 = $_POST['temp_Amount'];
+		// $model->HandCraftedMaterials = $_POST['temp_NetTaxable'];
+		// }
+		// if($_POST['Type']=='BusinessOfSoftwareDevelopment'){
+		// $model->BusinessOfSoftwareDevelopment_1 = $_POST['temp_Amount'];
+		// $model->BusinessOfSoftwareDevelopment = $_POST['temp_NetTaxable'];
+		// }
+		// if($_POST['Type']=='NTTN'){
+		// $model->NTTN_1 = $_POST['temp_Amount'];
+		// $model->NTTN = $_POST['temp_NetTaxable'];
+		// }
+		// if($_POST['Type']=='ITES'){
+		// 	$model->ITES_1 = $_POST['temp_Amount'];
+		// 	$model->ITES = $_POST['temp_NetTaxable'];
+		// }
+		// if($_POST['Type']=='PoultryFarm'){
+		// 	$model->PoultryFarm_1 = $_POST['temp_Amount'];
+		// 	$model->PoultryFarm = $_POST['temp_NetTaxable'];
+		// }
+		// if($_POST['Type']=='SmallMediumEnterprise'){
+		// 	$model->AnnualTurnover = $_POST['AnnualTurnover'];
+
+		// 	$model->SmallMediumEnterprise_1 = $_POST['temp_Amount'];
+		// 	$model->SmallMediumEnterprise = $_POST['temp_NetTaxable'];
+		// }
+		// if($_POST['Type']=='Others'){
+		// 	$model->Others_1 = $_POST['temp_Amount'];
+		// 	$model->Others = $_POST['temp_NetTaxable'];
+		// }
+		if($_POST['Type']=='IncomeFromBusiness1'){
+			$model->IncomeFromBusiness1_1 = $_POST['temp_Amount'];
+			$model->IncomeFromBusiness1 = $_POST['temp_NetTaxable'];
+		}
+		if($_POST['Type']=='IncomeFromBusiness2'){
+			$model->IncomeFromBusiness2_1 = $_POST['temp_Amount'];
+			$model->IncomeFromBusiness2 = $_POST['temp_NetTaxable'];
+		}
+		if($_POST['Type']=='IncomeFromBusiness3'){
+			$model->IncomeFromBusiness3_1 = $_POST['temp_Amount'];
+			$model->IncomeFromBusiness3 = $_POST['temp_NetTaxable'];
+		}
+		$model->TotalAmountIncome = $TotalAmountIncome;
+		$model->Cost = $Cost;
+		$model->IncomeId = $_POST['IncomeId'];
+		// var_dump($TotalAmountIncome);
+		// var_dump($Cost);
+		// die;
+
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}else{
+
+		//UPDATE
+		$model=new $_POST['model'];
+		// if($_POST['Type']=='ExportBusiness'){
+		// 	$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+		// 	"ExportBusiness_1" => $_POST['temp_Amount'],
+		// 	"ExportBusiness" => $_POST['temp_NetTaxable'],
+
+		// 	"TotalAmountIncome" => $TotalAmountIncome,
+		// 	"Cost" => $Cost,
+
+		// 	'IncomeId' => $_POST['IncomeId'],			
+		// 	'LastUpdateAt' => date("Y-m-d H:i:s")
+		// 	));
+		// }
+		// if($_POST['Type']=='HandCraftedMaterials'){
+		// 	$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+		// 	"HandCraftedMaterials_1" => $_POST['temp_Amount'],
+		// 	"HandCraftedMaterials" => $_POST['temp_NetTaxable'],
+
+		// 	"TotalAmountIncome" => $TotalAmountIncome,
+		// 	"Cost" => $Cost,
+
+		// 	'IncomeId' => $_POST['IncomeId'],			
+		// 	'LastUpdateAt' => date("Y-m-d H:i:s")
+		// 	));
+		// }
+		// if($_POST['Type']=='BusinessOfSoftwareDevelopment'){
+		// 	$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+		// 	"BusinessOfSoftwareDevelopment_1" => $_POST['temp_Amount'],
+		// 	"BusinessOfSoftwareDevelopment" => $_POST['temp_NetTaxable'],
+
+		// 	"TotalAmountIncome" => $TotalAmountIncome,
+		// 	"Cost" => $Cost,
+
+		// 	'IncomeId' => $_POST['IncomeId'],			
+		// 	'LastUpdateAt' => date("Y-m-d H:i:s")
+		// 	));
+		// }
+		// if($_POST['Type']=='NTTN'){
+		// 	$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+		// 	"NTTN_1" => $_POST['temp_Amount'],
+		// 	"NTTN" => $_POST['temp_NetTaxable'],
+
+		// 	"TotalAmountIncome" => $TotalAmountIncome,
+		// 	"Cost" => $Cost,
+
+		// 	'IncomeId' => $_POST['IncomeId'],			
+		// 	'LastUpdateAt' => date("Y-m-d H:i:s")
+		// 	));
+		// }
+		// if($_POST['Type']=='ITES'){
+		// 	$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+		// 	"ITES_1" => $_POST['temp_Amount'],
+		// 	"ITES" => $_POST['temp_NetTaxable'],
+
+		// 	"TotalAmountIncome" => $TotalAmountIncome,
+		// 	"Cost" => $Cost,
+
+		// 	'IncomeId' => $_POST['IncomeId'],			
+		// 	'LastUpdateAt' => date("Y-m-d H:i:s")
+		// 	));
+		// }
+		// if($_POST['Type']=='PoultryFarm'){
+		// 	$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+		// 	"PoultryFarm_1" => $_POST['temp_Amount'],
+		// 	"PoultryFarm" => $_POST['temp_NetTaxable'],
+
+		// 	"TotalAmountIncome" => $TotalAmountIncome,
+		// 	"Cost" => $Cost,
+
+		// 	'IncomeId' => $_POST['IncomeId'],			
+		// 	'LastUpdateAt' => date("Y-m-d H:i:s")
+		// 	));
+		// }
+		// if($_POST['Type']=='SmallMediumEnterprise'){
+		// 	$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+		// 	"AnnualTurnover" => $_POST['Sales'],
+
+		// 	"SmallMediumEnterprise_1" => $_POST['temp_Amount'],
+		// 	"SmallMediumEnterprise" => $_POST['temp_NetTaxable'],
+
+		// 	"TotalAmountIncome" => $TotalAmountIncome,
+		// 	"Cost" => $Cost,
+
+		// 	'IncomeId' => $_POST['IncomeId'],			
+		// 	'LastUpdateAt' => date("Y-m-d H:i:s")
+		// 	));
+		// }
+		// if($_POST['Type']=='Others'){
+		// 	$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+		// 	"Others_1" => $_POST['temp_Amount'],
+		// 	"Others" => $_POST['temp_NetTaxable'],
+
+		// 	"TotalAmountIncome" => $TotalAmountIncome,
+		// 	"Cost" => $Cost,
+
+		// 	'IncomeId' => $_POST['IncomeId'],			
+		// 	'LastUpdateAt' => date("Y-m-d H:i:s")
+		// 	));
+		// }
+		if($_POST['Type']=='IncomeFromBusiness1'){
+			$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+			"IncomeFromBusiness1_1" => $_POST['temp_Amount'],
+			"IncomeFromBusiness1" => $_POST['temp_NetTaxable'],
+
+			"TotalAmountIncome" => $TotalAmountIncome,
+			"Cost" => $Cost,
+
+			'IncomeId' => $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+		}
+		if($_POST['Type']=='IncomeFromBusiness2'){
+			$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+			"IncomeFromBusiness2_1" => $_POST['temp_Amount'],
+			"IncomeFromBusiness2" => $_POST['temp_NetTaxable'],
+
+			"TotalAmountIncome" => $TotalAmountIncome,
+			"Cost" => $Cost,
+
+			'IncomeId' => $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+		}
+		if($_POST['Type']=='IncomeFromBusiness3'){
+			$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+			"IncomeFromBusiness3_1" => $_POST['temp_Amount'],
+			"IncomeFromBusiness3" => $_POST['temp_NetTaxable'],
+
+			"TotalAmountIncome" => $TotalAmountIncome,
+			"Cost" => $Cost,
+
+			'IncomeId' => $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+		}
+
+		// $model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+		// 	"ExportBusiness_1" => $_POST['ExportBusiness_1'],
+		// 	"ExportBusiness" => $_POST['ExportBusiness'],
+
+		// 	"HandCraftedMaterials_1" => $_POST['ExportBusiness_1'],
+		// 	"HandCraftedMaterials" => $_POST['ExportBusiness'],
+
+		// 	"BusinessOfSoftwareDevelopment_1" => $_POST['ExportBusiness_1'],
+		// 	"BusinessOfSoftwareDevelopment" => $_POST['ExportBusiness'],
+
+		// 	"NTTN_1" => $_POST['ExportBusiness_1'],
+		// 	"NTTN" => $_POST['ExportBusiness'],
+
+		// 	"ITES_1" => $_POST['ExportBusiness_1'],
+		// 	"ITES" => $_POST['ExportBusiness'],
+
+		// 	"PoultryFarm_1" => $_POST['ExportBusiness_1'],
+		// 	"PoultryFarm" => $_POST['ExportBusiness'],
+
+		// 	"AnnualTurnover" => $_POST['AnnualTurnover'],
+
+		// 	"SmallMediumEnterprise_1" => $_POST['ExportBusiness_1'],
+		// 	"SmallMediumEnterprise" => $_POST['ExportBusiness'],
+
+		// 	"Others_1" => $_POST['ExportBusiness_1'],
+		// 	"Others" => $_POST['ExportBusiness'],
+
+		// 	"TotalAmountIncome" => $TotalAmountIncome,
+		// 	"Cost" => $Cost,
+
+		// 	'IncomeId' => $_POST['IncomeId'],			
+		// 	'LastUpdateAt' => date("Y-m-d H:i:s")
+		// 	));
+	}
+
+
+	if(empty($isNewIncomeBusinessOrProfessionDetails)){
+		$model=new IncIncomeBusinessOrProfessionDetails;
+
+		$model->Type = $_POST['Type'];
+		$model->BusinessOrProfessionName = $_POST['BusinessOrProfessionName'];
+		$model->Address = $_POST['Address'];
+		$model->Sales = $_POST['Sales'];
+		$model->GrossProfit = $_POST['GrossProfit'];
+		$model->OtherExpense = $_POST['OtherExpense'];
+		$model->NetProfit = $_POST['NetProfit'];
+		$model->CashInHandOrBank = $_POST['CashInHandOrBank'];
+		$model->Inventories = $_POST['Inventories'];
+		$model->FixedAssets = $_POST['FixedAssets'];
+		$model->OtherAssets = $_POST['OtherAssets'];
+		$model->TotalAssets = $_POST['TotalAssets'];
+		$model->OpeningCapital = $_POST['OpeningCapital'];
+		$model->WithdrawlsInIncomeYear = $_POST['WithdrawlsInIncomeYear'];
+		$model->ClosingCapital = $_POST['ClosingCapital'];
+		$model->Liabilities = $_POST['Liabilities'];
+		$model->TotalCapitalLiabilities = $_POST['TotalCapitalLiabilities'];
+		$model->BusinessIncomeExempted = $_POST['BusinessIncomeExempted'];
+
+		$model->IncomeId = $_POST['IncomeId'];
+
+
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}else{
+		//UPDATE
+		$model= new IncIncomeBusinessOrProfessionDetails;
+		$model->updateByPk($isNewIncomeBusinessOrProfessionDetails[0]->IncomeBusinessOrProfessionDetailsId, array(
+			
+			'IncomeId' => $_POST['IncomeId'],			
+			"Type" => $_POST['Type'],
+			"BusinessOrProfessionName" => $_POST['BusinessOrProfessionName'],
+			"Address" => $_POST['Address'],
+			"Sales" => $_POST['Sales'],
+			"GrossProfit" => $_POST['GrossProfit'],
+			"OtherExpense" => $_POST['OtherExpense'],
+			"NetProfit" => $_POST['NetProfit'],
+			"CashInHandOrBank" => $_POST['CashInHandOrBank'],
+			"Inventories" => $_POST['Inventories'],
+			"FixedAssets" => $_POST['FixedAssets'],
+			"OtherAssets" => $_POST['OtherAssets'],
+			"TotalAssets" => $_POST['TotalAssets'],
+			"OpeningCapital" => $_POST['OpeningCapital'],
+			"WithdrawlsInIncomeYear" => $_POST['WithdrawlsInIncomeYear'],
+			"ClosingCapital" => $_POST['ClosingCapital'],
+			"Liabilities" => $_POST['Liabilities'],
+			"TotalCapitalLiabilities" => $_POST['TotalCapitalLiabilities'],
+			"BusinessIncomeExempted" => $_POST['BusinessIncomeExempted'],
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+}
+
+public function ActionSaveFrcOfBusinessOrProfessio()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+		$_POST['ExportBusiness_1'] = $this->checkNumeric($_POST['ExportBusiness_1']);
+		$_POST['ExportBusiness'] = $this->checkNumeric($_POST['ExportBusiness']);
+
+		$_POST['HandCraftedMaterials_1'] = $this->checkNumeric($_POST['HandCraftedMaterials_1']);
+		$_POST['HandCraftedMaterials'] = $this->checkNumeric($_POST['HandCraftedMaterials']);
+
+		$_POST['BusinessOfSoftwareDevelopment_1'] = $this->checkNumeric($_POST['BusinessOfSoftwareDevelopment_1']);
+		$_POST['BusinessOfSoftwareDevelopment'] = $this->checkNumeric($_POST['BusinessOfSoftwareDevelopment']);
+
+		$_POST['NTTN_1'] = $this->checkNumeric($_POST['NTTN_1']);
+		$_POST['NTTN'] = $this->checkNumeric($_POST['NTTN']);
+
+		$_POST['ITES_1'] = $this->checkNumeric($_POST['ITES_1']);
+		$_POST['ITES'] = $this->checkNumeric($_POST['ITES']);
+
+		$_POST['PoultryFarm_1'] = $this->checkNumeric($_POST['PoultryFarm_1']);
+		$_POST['PoultryFarm'] = $this->checkNumeric($_POST['PoultryFarm']);
+
+		$_POST['AnnualTurnover'] = $this->checkNumeric($_POST['AnnualTurnover']); 
+		
+		$_POST['SmallMediumEnterprise_1'] = $this->checkNumeric($_POST['SmallMediumEnterprise_1']);
+		$_POST['SmallMediumEnterprise'] = $this->checkNumeric($_POST['SmallMediumEnterprise']);
+
+
+		$_POST['Others_1'] = $this->checkNumeric($_POST['Others_1']);
+		$_POST['Others'] = $this->checkNumeric($_POST['Others']);
+
+		//Sum of total amount income
+		$TotalAmountIncome = $_POST['ExportBusiness_1'] + $_POST['HandCraftedMaterials_1'] + $_POST['BusinessOfSoftwareDevelopment_1'] + $_POST['NTTN_1'] + $_POST['ITES_1'] + $_POST['PoultryFarm_1'] + $_POST['SmallMediumEnterprise_1'] + $_POST['Others_1'] ;
+		//Sum of taxable income
+		$Cost = $_POST['ExportBusiness'] + $_POST['HandCraftedMaterials'] + $_POST['BusinessOfSoftwareDevelopment'] + $_POST['NTTN'] + $_POST['ITES'] + $_POST['PoultryFarm'] + $_POST['SmallMediumEnterprise'] + $_POST['Others'];
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+	}
+
+	if($_POST['IncomeOtherSourceId'] == "notSet")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		$model->ExportBusiness_1 = $_POST['ExportBusiness_1'];
+		$model->ExportBusiness = $_POST['ExportBusiness'];
+
+		$model->HandCraftedMaterials_1 = $_POST['HandCraftedMaterials_1'];
+		$model->HandCraftedMaterials = $_POST['HandCraftedMaterials'];
+
+		$model->BusinessOfSoftwareDevelopment_1 = $_POST['BusinessOfSoftwareDevelopment_1'];
+		$model->BusinessOfSoftwareDevelopment = $_POST['BusinessOfSoftwareDevelopment'];
+
+		$model->NTTN_1 = $_POST['NTTN_1'];
+		$model->NTTN = $_POST['NTTN'];
+
+		$model->ITES_1 = $_POST['ITES_1'];
+		$model->ITES = $_POST['ITES'];
+
+		$model->PoultryFarm_1 = $_POST['PoultryFarm_1'];
+		$model->PoultryFarm = $_POST['PoultryFarm'];
+
+		$model->AnnualTurnover = $_POST['AnnualTurnover'];
+
+		$model->SmallMediumEnterprise_1 = $_POST['SmallMediumEnterprise_1'];
+		$model->SmallMediumEnterprise = $_POST['SmallMediumEnterprise'];
+
+		$model->Others_1 = $_POST['Others_1'];
+		$model->Others = $_POST['Others'];
+
+		$model->TotalAmountIncome = $TotalAmountIncome;
+		$model->Cost = $Cost;
+		$model->IncomeId = $_POST['IncomeId'];
+
+
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+			"ExportBusiness_1" => $_POST['ExportBusiness_1'],
+			"ExportBusiness" => $_POST['ExportBusiness'],
+
+			"HandCraftedMaterials_1" => $_POST['HandCraftedMaterials_1'],
+			"HandCraftedMaterials" => $_POST['HandCraftedMaterials'],
+
+			"BusinessOfSoftwareDevelopment_1" => $_POST['BusinessOfSoftwareDevelopment_1'],
+			"BusinessOfSoftwareDevelopment" => $_POST['BusinessOfSoftwareDevelopment'],
+
+			"NTTN_1" => $_POST['NTTN_1'],
+			"NTTN" => $_POST['NTTN'],
+
+			"ITES_1" => $_POST['ITES_1'],
+			"ITES" => $_POST['ITES'],
+
+			"PoultryFarm_1" => $_POST['PoultryFarm_1'],
+			"PoultryFarm" => $_POST['PoultryFarm'],
+
+			"AnnualTurnover" => $_POST['AnnualTurnover'],
+
+			"SmallMediumEnterprise_1" => $_POST['SmallMediumEnterprise_1'],
+			"SmallMediumEnterprise" => $_POST['SmallMediumEnterprise'],
+
+			"Others_1" => $_POST['Others_1'],
+			"Others" => $_POST['Others'],
+
+			"TotalAmountIncome" => $TotalAmountIncome,
+			"Cost" => $Cost,
+
+			'IncomeId' => $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+
+
+public function ActionSaveFrcOfShareProfit()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+
+
+		
+		if($_POST['IncIncomeShareProfit_NameOfFirm'] == "" )
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Name of firm can not be empty");
+			die(json_encode($data));
+		}
+		
+		if($_POST['IncIncomeShareProfit_IncomeOfFirm'] == "" || !is_numeric($_POST['IncIncomeShareProfit_IncomeOfFirm']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Firm Income must be a number");
+			die(json_encode($data));
+		}
+
+		if($_POST['IncIncomeShareProfit_ShareOfFirm'] == "" || !is_numeric($_POST['IncIncomeShareProfit_ShareOfFirm']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Share of firm must be a number");
+			die(json_encode($data));
+		}
+		
+		if($_POST['IncIncomeShareProfit_Cost'] == "" || !is_numeric($_POST['IncIncomeShareProfit_Cost']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Cost must be a number");
+			die(json_encode($data));
+		}
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+	}
+
+	if($_POST['IncomeShareProfitId'] == "notSet")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		$model->NameOfFirm 				= $_POST['IncIncomeShareProfit_NameOfFirm'];
+		$model->IncomeOfFirm 			= $_POST['IncIncomeShareProfit_IncomeOfFirm'];
+		$model->ShareOfFirm 			= $_POST['IncIncomeShareProfit_ShareOfFirm'];
+		$model->Cost 					= $_POST['IncIncomeShareProfit_Cost'];
+		$model->IncomeId 				= $_POST['IncomeId'];
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		// $data = $_POST['IncIncomeShareProfit'];
+
+		// foreach ($data as $key => $value) {
+
+		// 	if(isset($value)) { $model->$key = $value; }
+
+		// }
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%|><><><><><><><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['IncomeShareProfitId'], array(
+			'NameOfFirm' 			=> $_POST['IncIncomeShareProfit_NameOfFirm'],
+			'IncomeOfFirm' 			=> $_POST['IncIncomeShareProfit_IncomeOfFirm'],
+			'ShareOfFirm' 			=> $_POST['IncIncomeShareProfit_ShareOfFirm'],
+			'Cost' 					=> $_POST['IncIncomeShareProfit_Cost'],
+			'IncomeId' 				=> $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+
+
+
+public function ActionSaveFrcOfSpouseOrChild()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+
+
+		
+		if($_POST['IncIncomeSpouseOrChild_Type'] == "" )
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Type can not be empty");
+			die(json_encode($data));
+		}
+
+		if($_POST['IncIncomeSpouseOrChild_Name'] == "" )
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Name can not be empty");
+			die(json_encode($data));
+		}
+		
+		if($_POST['IncIncomeSpouseOrChild_Cost'] == "" || !is_numeric($_POST['IncIncomeSpouseOrChild_Cost']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Cost must be a number");
+			die(json_encode($data));
+		}
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+	}
+
+	if($_POST['IncomeSpouseOrChildId'] == "notSet")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		$model->Type 					= $_POST['IncIncomeSpouseOrChild_Type'];
+		$model->Name 					= $_POST['IncIncomeSpouseOrChild_Name'];
+		$model->Cost 					= $_POST['IncIncomeSpouseOrChild_Cost'];
+		$model->IncomeId 				= $_POST['IncomeId'];
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		// $data = $_POST['IncIncomeSpouseOrChild'];
+
+		// foreach ($data as $key => $value) {
+
+		// 	if(isset($value)) { $model->$key = $value; }
+
+		// }
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%|><><><><><><><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['IncomeSpouseOrChildId'], array(
+			'Type' 					=> $_POST['IncIncomeSpouseOrChild_Type'],
+			'Name' 			=> $_POST['IncIncomeSpouseOrChild_Name'],
+			'Cost' 					=> $_POST['IncIncomeSpouseOrChild_Cost'],
+			'IncomeId' 				=> $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+
+
+
+public function ActionSaveFrcOfCapitalGains()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+
+
+		
+		if($_POST['IncIncomeCapitalGains_Type'] == "" )
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Asset name can not be empty");
+			die(json_encode($data));
+		}
+		
+		if($_POST['IncIncomeCapitalGains_Cost'] == "" || !is_numeric($_POST['IncIncomeCapitalGains_Cost']) || $_POST['SaleOfShare'] == "" || !is_numeric($_POST['SaleOfShare']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Sale of Share and Net gain must be a number");
+			die(json_encode($data));
+		}
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+	}
+
+	if($_POST['IncomeCapitalGainsId'] == "notSet")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		$model->Type 						= $_POST['IncIncomeCapitalGains_Type'];
+		$model->Description 				= $_POST['IncIncomeCapitalGains_Description'];
+		$model->SaleOfShare 				= $_POST['SaleOfShare'];
+		$model->MoreThanTenPercentHolder 	= $_POST['MoreThanTenPercentHolder'];
+		$model->Cost 						= $_POST['IncIncomeCapitalGains_Cost'];
+		$model->IncomeId 					= $_POST['IncomeId'];
+		if(isset($_POST['tds_amount']) && $_POST['IncIncomeCapitalGains_Type']=="Signing Money Received"){
+			$model->tds_amount 	= $_POST['tds_amount'];
+		}
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		// $data = $_POST['IncIncIncomeCapitalGains'];
+
+		// foreach ($data as $key => $value) {
+
+		// 	if(isset($value)) { $model->$key = $value; }
+
+		// }
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%|><><><><><><><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['IncomeCapitalGainsId'], array(
+			'Type' 						=> $_POST['IncIncomeCapitalGains_Type'],
+			'Description' 				=> $_POST['IncIncomeCapitalGains_Description'],
+			'SaleOfShare' 				=> $_POST['SaleOfShare'],
+			'MoreThanTenPercentHolder' 	=> $_POST['MoreThanTenPercentHolder'],
+			'Cost' 						=> $_POST['IncIncomeCapitalGains_Cost'],
+			'IncomeId' 					=> $_POST['IncomeId'],	
+			'tds_amount'                => $_POST['tds_amount'],		
+			'LastUpdateAt' 				=> date("Y-m-d H:i:s")
+			));
+	}
+
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+
+
+
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%START%%%%%%%%%^^SaveFrcOfOtherSource^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+public function ActionSaveFrcOfOtherSource()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+		$_POST['InterestFromMutualFund_1'] = $this->checkNumeric($_POST['InterestFromMutualFund_1']);
+		$_POST['InterestFromMutualFund'] = $this->checkNumeric($_POST['InterestFromMutualFund']);
+
+		$_POST['CashDividend_1'] = $this->checkNumeric($_POST['CashDividend_1']);
+		$_POST['CashDividend'] = $this->checkNumeric($_POST['CashDividend']);
+
+		$_POST['InterestIncomeFromWEDB_1'] = $this->checkNumeric($_POST['InterestIncomeFromWEDB_1']);
+		$_POST['InterestIncomeFromWEDB'] = $this->checkNumeric($_POST['InterestIncomeFromWEDB']);
+
+		$_POST['USDollarPremium_1'] = $this->checkNumeric($_POST['USDollarPremium_1']);
+		$_POST['USDollarPremium'] = $this->checkNumeric($_POST['USDollarPremium']);
+
+		$_POST['PoundSterlingPremium_1'] = $this->checkNumeric($_POST['PoundSterlingPremium_1']);
+		$_POST['PoundSterlingPremium'] = $this->checkNumeric($_POST['PoundSterlingPremium']);
+
+		$_POST['EuroPremium_1'] = $this->checkNumeric($_POST['EuroPremium_1']);
+		$_POST['EuroPremium'] = $this->checkNumeric($_POST['EuroPremium']);
+
+		$_POST['InvestmentInInstrument'] = $this->checkNumeric($_POST['InvestmentInInstrument']); 
+		
+		$_POST['InterestFromInstrument_1'] = $this->checkNumeric($_POST['InterestFromInstrument_1']);
+		$_POST['InterestFromInstrument'] = $this->checkNumeric($_POST['InterestFromInstrument']);
+
+
+		$_POST['SanchaypatraIncome'] = $this->checkNumeric($_POST['SanchaypatraIncome']);
+		$_POST['SanchaypatraIncome_1'] = $this->checkNumeric($_POST['SanchaypatraIncome_1']);
+		
+		$_POST['TDSFromSanchaypatra'] = $this->checkNumeric($_POST['TDSFromSanchaypatra']);
+
+		$_POST['Others_1'] = $this->checkNumeric($_POST['Others_1']);
+		$_POST['Others'] = $this->checkNumeric($_POST['Others']);
+
+		//Sum of total amount income
+		//$TotalAmountIncome = $_POST['InterestFromMutualFund_1'] + $_POST['CashDividend_1'] + $_POST['InterestIncomeFromWEDB_1'] + $_POST['USDollarPremium_1'] + $_POST['PoundSterlingPremium_1'] + $_POST['EuroPremium_1'] + $_POST['InvestmentInInstrument'] + $_POST['InterestFromInstrument_1'] + $_POST['Others_1'];
+		$TotalAmountIncome = $_POST['InterestFromMutualFund_1'] + $_POST['CashDividend_1'] + $_POST['InterestIncomeFromWEDB_1'] + $_POST['USDollarPremium_1'] + $_POST['PoundSterlingPremium_1'] + $_POST['EuroPremium_1'] + $_POST['InterestFromInstrument_1'] + $_POST['Others_1'] + $_POST['SanchaypatraIncome'];
+
+		//Sum of taxable income
+		$Cost = $_POST['InterestFromMutualFund'] + $_POST['CashDividend'] + $_POST['InterestIncomeFromWEDB'] + $_POST['USDollarPremium'] + $_POST['PoundSterlingPremium'] + $_POST['EuroPremium'] + $_POST['InterestFromInstrument'] + $_POST['Others'] + $_POST['SanchaypatraIncome_1'];
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+	}
+
+	if($_POST['IncomeOtherSourceId'] == "notSet")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		$model->InterestFromMutualFund_1 = $_POST['InterestFromMutualFund_1'];
+		$model->InterestFromMutualFund = $_POST['InterestFromMutualFund'];
+
+		$model->CashDividend_1 = $_POST['CashDividend_1'];
+		$model->CashDividend = $_POST['CashDividend'];
+
+		$model->InterestIncomeFromWEDB_1 = $_POST['InterestIncomeFromWEDB_1'];
+		$model->InterestIncomeFromWEDB = $_POST['InterestIncomeFromWEDB'];
+
+		$model->USDollarPremium_1 = $_POST['USDollarPremium_1'];
+		$model->USDollarPremium = $_POST['USDollarPremium'];
+
+		$model->PoundSterlingPremium_1 = $_POST['PoundSterlingPremium_1'];
+		$model->PoundSterlingPremium = $_POST['PoundSterlingPremium'];
+
+		$model->EuroPremium_1 = $_POST['EuroPremium_1'];
+		$model->EuroPremium = $_POST['EuroPremium'];
+
+		$model->InvestmentInInstrument = $_POST['InvestmentInInstrument'];
+
+		$model->InterestFromInstrument_1 = $_POST['InterestFromInstrument_1'];
+		$model->InterestFromInstrument = $_POST['InterestFromInstrument'];
+
+		$model->InterestFromInstrument_1 = $_POST['InterestFromInstrument_1'];
+		$model->InterestFromInstrument = $_POST['InterestFromInstrument'];
+
+		$model->SanchaypatraIncome = $_POST['SanchaypatraIncome'];
+		$model->SanchaypatraIncome_1 = $_POST['SanchaypatraIncome_1'];
+
+		$model->TDSFromSanchaypatra = $_POST['TDSFromSanchaypatra'];
+
+
+		$model->Others_1 = $_POST['Others_1'];
+		$model->Others = $_POST['Others'];
+
+		$model->TotalAmountIncome = $TotalAmountIncome;
+		$model->Cost = $Cost;
+		$model->IncomeId = $_POST['IncomeId'];
+
+
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['IncomeOtherSourceId'], array(
+			
+			"InterestFromMutualFund_1" => $_POST['InterestFromMutualFund_1'],
+			"InterestFromMutualFund" => $_POST['InterestFromMutualFund'],
+
+			"CashDividend_1" => $_POST['CashDividend_1'],
+			"CashDividend" => $_POST['CashDividend'],
+
+			"InterestIncomeFromWEDB_1" => $_POST['InterestIncomeFromWEDB_1'],
+			"InterestIncomeFromWEDB" => $_POST['InterestIncomeFromWEDB'],
+
+			"USDollarPremium_1" => $_POST['USDollarPremium_1'],
+			"USDollarPremium" => $_POST['USDollarPremium'],
+
+			"PoundSterlingPremium_1" => $_POST['PoundSterlingPremium_1'],
+			"PoundSterlingPremium" => $_POST['PoundSterlingPremium'],
+
+			"EuroPremium_1" => $_POST['EuroPremium_1'],
+			"EuroPremium" => $_POST['EuroPremium'],
+
+			"InvestmentInInstrument" => $_POST['InvestmentInInstrument'],
+
+			"InterestFromInstrument_1" => $_POST['InterestFromInstrument_1'],
+			"InterestFromInstrument" => $_POST['InterestFromInstrument'],
+
+			"SanchaypatraIncome" => $_POST['SanchaypatraIncome'],
+			"SanchaypatraIncome_1" => $_POST['SanchaypatraIncome_1'],
+
+			"TDSFromSanchaypatra" => $_POST['TDSFromSanchaypatra'],
+
+			"Others_1" => $_POST['Others_1'],
+			"Others" => $_POST['Others'],
+
+			"TotalAmountIncome" => $TotalAmountIncome,
+			"Cost" => $Cost,
+
+			'IncomeId' => $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+function checkNumeric ($val) {
+	if ( $val == "" || !is_numeric($val) ) {
+		return 0;
+	}
+	else {
+		return $val;
+	}
+}
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%END%%%%%%%%%|><SaveFrcOfOtherSource><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+public function ActionSaveFrcOfForeignIncome()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+		
+		// if($_POST['IncForeignIncome_Type'] == "" )
+		// {
+		// 	$data['status'] = "failed";
+		// 	$data['msg'] = Yii::t("income","Type can not be empty");
+		// 	die(json_encode($data));
+		// }
+		
+		if($_POST['IncForeignIncome_Cost'] == "" || !is_numeric($_POST['IncForeignIncome_Cost']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Cost must be a number");
+			die(json_encode($data));
+		}
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+	}
+
+	if($_POST['ForeignIncomeId'] == "notSet")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		// $model->Type 					= $_POST['IncForeignIncome_Type'];
+		$model->Description 			= $_POST['IncForeignIncome_Description'];
+		$model->Cost 					= $_POST['IncForeignIncome_Cost'];
+		$model->IncomeId 				= $_POST['IncomeId'];
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		// $data = $_POST['IncIncForeignIncome'];
+
+		// foreach ($data as $key => $value) {
+
+		// 	if(isset($value)) { $model->$key = $value; }
+
+		// }
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%|><><><><><><><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['ForeignIncomeId'], array(
+			// 'Type' 					=> $_POST['IncForeignIncome_Type'],
+			'Description' 			=> $_POST['IncForeignIncome_Description'],
+			'Cost' 					=> $_POST['IncForeignIncome_Cost'],
+			'IncomeId' 				=> $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+
+
+
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%END%%%%%%%%%|><SaveFrcOfOtherSource><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% START %%%%%%%%%|><Save Income Tax Deducted Source><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+public function ActionSaveFrcOfIncomeTaxDeductedSource()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+		
+		// if($_POST['IncForeignIncome_Type'] == "" )
+		// {
+		// 	$data['status'] = "failed";
+		// 	$data['msg'] = Yii::t("income","Type can not be empty");
+		// 	die(json_encode($data));
+		// }
+		
+		if($_POST['IncIncomeTaxDeductedAtSource_Cost'] == "" || !is_numeric($_POST['IncIncomeTaxDeductedAtSource_Cost']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Cost must be a number");
+			die(json_encode($data));
+		}
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+	}
+
+	if($_POST['IncIncomeTaxDeductedAtSourceId'] == "notSet")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		// $model->Type 					= $_POST['IncForeignIncome_Type'];
+		$model->Description 			= $_POST['IncIncomeTaxDeductedAtSource_Description'];
+		$model->Cost 					= $_POST['IncIncomeTaxDeductedAtSource_Cost'];
+		$model->IncomeId 				= $_POST['IncomeId'];
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		// $data = $_POST['IncIncForeignIncome'];
+
+		// foreach ($data as $key => $value) {
+
+		// 	if(isset($value)) { $model->$key = $value; }
+
+		// }
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%|><><><><><><><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['IncIncomeTaxDeductedAtSourceId'], array(
+			// 'Type' 					=> $_POST['IncForeignIncome_Type'],
+			'Description' 			=> $_POST['IncIncomeTaxDeductedAtSource_Description'],
+			'Cost' 					=> $_POST['IncIncomeTaxDeductedAtSource_Cost'],
+			'IncomeId' 				=> $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End %%%%%%%%%|><Save Income Tax Deducted Source><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% START %%%%%%%%%|><Save Income Tax In Advance><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+public function ActionSaveFrcOfIncomeTaxInAdvance()
+{
+	$data = [];
+	if(!Yii::app()->request->isPostRequest)
+	{
+		$data['status'] = "failed";
+		$data['msg'] = "Invalid Request";
+
+		die(json_encode($data));
+	}
+	else
+	{
+		
+		// if($_POST['IncForeignIncome_Type'] == "" )
+		// {
+		// 	$data['status'] = "failed";
+		// 	$data['msg'] = Yii::t("income","Type can not be empty");
+		// 	die(json_encode($data));
+		// }
+		
+		if($_POST['IncIncomeTaxInAdvance_Cost'] == "" || !is_numeric($_POST['IncIncomeTaxInAdvance_Cost']))
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","Income must be a number");
+			die(json_encode($data));
+		}
+
+		$get_data=Income::model()->findByPk($_POST['IncomeId']);
+		if($get_data == null)
+		{
+			$data['status'] = "failed";
+			$data['msg'] = Yii::t("income","No data found");
+			die(json_encode($data));
+		}
+
+	}
+
+	if($_POST['IncIncomeTaxInAdvanceId'] == "notSet")
+	{
+		//NEW ENTRY
+		$model=new $_POST['model'];
+
+		// $model->Type 					= $_POST['IncForeignIncome_Type'];
+		$model->Description 			= $_POST['IncIncomeTaxInAdvance_Description'];
+		$model->Cost 					= $_POST['IncIncomeTaxInAdvance_Cost'];
+		$model->IncomeId 				= $_POST['IncomeId'];
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		// $data = $_POST['IncIncForeignIncome'];
+
+		// foreach ($data as $key => $value) {
+
+		// 	if(isset($value)) { $model->$key = $value; }
+
+		// }
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%|><><><><><><><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		$model->save(false);
+
+		$model2=new Income;
+		$model2->updateByPk($_POST['IncomeId'], array(
+			$_POST['field_name']."Confirm" => "Yes",
+			$_POST['field_name']."FOrT" => "Fraction",
+			$_POST['field_name'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+	else {
+		//UPDATE
+		$model=new $_POST['model'];
+		$model->updateByPk($_POST['IncIncomeTaxInAdvanceId'], array(
+			// 'Type' 					=> $_POST['IncForeignIncome_Type'],
+			'Description' 			=> $_POST['IncIncomeTaxInAdvance_Description'],
+			'Cost' 					=> $_POST['IncIncomeTaxInAdvance_Cost'],
+			'IncomeId' 				=> $_POST['IncomeId'],			
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+	}
+
+
+	$data['status'] = "success";
+
+	$data['msg'] = Yii::t("income","Successfully Stored");
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Stored"));
+	echo json_encode($data);
+	
+}
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END %%%%%%%%%|><Save Income Tax In Advance><|%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+public function ActionGetDataForEdit() {
+	$get_data=$_POST['model']::model()->findByPk($_POST['id']);
+	echo CJSON::encode($get_data);
+}
+
+public function ActionDeleteData() {
+	$get = $_POST['model']::model()->findByPk($_POST['id']);
+
+	// var_dump($_POST['field']);die;
+
+	$_POST['model']::model()->findByPk($_POST['id'])->delete();
+
+	$counter = $_POST['model']::model()->count('IncomeId=:data',array(':data'=>$get->IncomeId));
+
+
+	if($counter == 0) {
+		$model2=new Income;
+		$model2->updateByPk($get->IncomeId, array(
+
+			$_POST['field']."Confirm" => null,
+			$_POST['field']."FOrT" => null,
+			$_POST['field'] => null,
+			'LastUpdateAt' => date("Y-m-d H:i:s")
+			));
+
+		if($_POST['field']=='IncomeAgriculture'){
+			$model2->updateByPk($get->IncomeId, array(
+				$_POST['field']."BooksOfAccount" => null,
+			));
+		}	
+	}
+
+	$data['status'] = "success";
+	$data['msg'] = "Successfully Deleted";
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Removed"));
+	echo json_encode($data);
+}
+
+public function ActionDeleteParticularFieldData() {
+	
+	$model2=new Income;
+	$model2->updateByPk($_POST['IncomeId'], array(
+		$_POST['field']."Confirm" => null,
+		$_POST['field']."FOrT" => null,
+		$_POST['field'] => null,
+		'LastUpdateAt' => date("Y-m-d H:i:s")
+		));
+
+	$data['status'] = "success";
+	$data['msg'] = "Successfully Deleted";
+	Yii::app()->user->setFlash('alert_success', Yii::t("income","Successfully Removed"));
+	echo json_encode($data);
+}
+
+
+function totalOutput($model,$val){
+
+	$Confirm 	= $val.'Confirm';
+	$FOrT 		= $val.'FOrT';
+	$sumOf 		='SumOf'.$val;
+	$Inc='Inc'.$val;
+
+
+		if($model->$Confirm == "Yes") {
+
+		if ($model->$FOrT=="Total") {	
+			return $val2 = $model->$val.Yii::t("income", $this->currency);
+		}
+
+		elseif($model->$FOrT == "Fraction") {
+			return $val2 = $Inc::model()->find(array(  'select'=>'SUM(Cost) as '.$sumOf, 'condition'=>'IncomeId=:data', 'params'=>array(':data'=>@$model->IncomeId) ) )->$sumOf.Yii::t("income", $this->currency);
+		}
+		else {
+			return Yii::t("income", "Not answered yet");
+		}
+	}
+	elseif($model->$Confirm == "No") {
+		return Yii::t("income", "You chose No");
+	}
+	else {
+		return Yii::t("income", "Not answered yet");
+	}
+}
+
+//######################################%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+public function actionSaveScheduleDetails(){
+	return $_REQUEST['Sales'];
+}
+
+protected function lastTaxYear() {
+
+	$currentMonth = date('m');
+
+	$startMonth = 7;
+	$taxYear = '';
+	$presentYear = date("Y",strtotime('last year'));
+
+	$lastYear = ($presentYear - 1);
+	$nextYear = ($presentYear + 1);
+
+	if ($currentMonth < $startMonth) {
+
+		$taxYear = $lastYear . "-" . $presentYear;
+
+	} else {
+		$taxYear = $presentYear . "-" . $nextYear;
+	}
+
+	return $taxYear;
+}
+
+
+public function actionCopyLastyear(){
+	try{
+		try{
+			$ly_income = Income::model()->find('CPIId=:data AND EntryYear=:data2',array(':data'=>Yii::app()->user->CPIId, ':data2'=>$this->lastTaxYear() ));
+			$old_income_id = $ly_income->IncomeId;
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			// echo '<pre>';
+			if( $ly_income != null ){
+				$clone_income = new Income();
+				$clone_income->setAttributes($ly_income->getAttributes(), false);
+				$clone_income->IncomeId = null;
+				$clone_income->EntryYear = $this->taxYear();
+				$clone_income->save(false);
+				$income_id = $clone_income->IncomeId;
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncIncomeBusinessOrProfession = IncIncomeBusinessOrProfession::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			if( isset($ly_IncIncomeBusinessOrProfession) && $ly_IncIncomeBusinessOrProfession != null ){
+				foreach($ly_IncIncomeBusinessOrProfession as $data){
+					$clone_IncIncomeBusinessOrProfession = new IncIncomeBusinessOrProfession();
+					$clone_IncIncomeBusinessOrProfession->setAttributes($data->getAttributes(), false);
+					$clone_IncIncomeBusinessOrProfession->IncomeBusinessOrProfessionId = null;
+					$clone_IncIncomeBusinessOrProfession->IncomeId = $income_id;
+					$clone_IncIncomeBusinessOrProfession->save(false);
+				}
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncIncomeBusinessOrProfessionDetails = IncIncomeBusinessOrProfessionDetails::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			if( isset($ly_IncIncomeBusinessOrProfessionDetails) && $ly_IncIncomeBusinessOrProfessionDetails != null ){
+				foreach($ly_IncIncomeBusinessOrProfessionDetails as $data){
+					$clone_IncIncomeBusinessOrProfessionDetails = new IncIncomeBusinessOrProfessionDetails();
+					$clone_IncIncomeBusinessOrProfessionDetails->setAttributes($data->getAttributes(), false);
+					$clone_IncIncomeBusinessOrProfessionDetails->IncomeBusinessOrProfessionDetailsId = null;
+					$clone_IncIncomeBusinessOrProfessionDetails->IncomeId = $income_id;
+					$clone_IncIncomeBusinessOrProfessionDetails->save(false);
+				}
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncIncomeCapitalGains = IncIncomeCapitalGains::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			// var_dump($ly_IncIncomeCapitalGains);
+			if( isset($ly_IncIncomeCapitalGains) && $ly_IncIncomeCapitalGains != null ){
+				foreach($ly_IncIncomeCapitalGains as $data){
+					$clone_IncIncomeCapitalGains = new IncIncomeCapitalGains();
+					$clone_IncIncomeCapitalGains->setAttributes($data->getAttributes(), false);
+					$clone_IncIncomeCapitalGains->IncomeCapitalGainsId = null;
+					$clone_IncIncomeCapitalGains->IncomeId = $income_id;
+					$clone_IncIncomeCapitalGains->save(false);
+				}
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncForeignIncome = IncForeignIncome::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			// var_dump($ly_IncForeignIncome);
+			if( isset($ly_IncForeignIncome) && $ly_IncForeignIncome != null ){
+				foreach($ly_IncForeignIncome as $data){
+					$clone_IncForeignIncome = new IncForeignIncome();
+					$clone_IncForeignIncome->setAttributes($data->getAttributes(), false);
+					$clone_IncForeignIncome->ForeignIncomeId = null;
+					$clone_IncForeignIncome->IncomeId = $income_id;
+					$clone_IncForeignIncome->save(false);
+				}
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncIncomeOtherSource = IncIncomeOtherSource::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			// var_dump($ly_IncIncomeOtherSource);
+			if( isset($ly_IncIncomeOtherSource) && $ly_IncIncomeOtherSource != null ){
+				foreach($ly_IncIncomeOtherSource as $data){
+					$clone_IncIncomeOtherSource = new IncIncomeOtherSource();
+					$clone_IncIncomeOtherSource->setAttributes($data->getAttributes(), false);
+					$clone_IncIncomeOtherSource->IncomeOtherSourceId = null;
+					$clone_IncIncomeOtherSource->IncomeId = $income_id;
+					$clone_IncIncomeOtherSource->save(false);
+				}
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncIncomeShareProfit = IncIncomeShareProfit::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			// var_dump($ly_IncIncomeShareProfit);
+			if( isset($ly_IncIncomeShareProfit) && $ly_IncIncomeShareProfit != null ){
+				foreach($ly_IncIncomeShareProfit as $data){
+					$clone_IncIncomeShareProfit = new IncIncomeShareProfit();
+					$clone_IncIncomeShareProfit->setAttributes($data->getAttributes(), false);
+					$clone_IncIncomeShareProfit->IncomeShareProfitId = null;
+					$clone_IncIncomeShareProfit->IncomeId = $income_id;
+					$clone_IncIncomeShareProfit->save(false);
+				}
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncIncomeSpouseOrChild = IncIncomeSpouseOrChild::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			// var_dump($ly_IncIncomeSpouseOrChild);
+			if( isset($ly_IncIncomeSpouseOrChild) && $ly_IncIncomeSpouseOrChild != null ){
+				foreach($ly_IncIncomeSpouseOrChild as $data){
+					$clone_IncIncomeSpouseOrChild = new IncIncomeSpouseOrChild();
+					$clone_IncIncomeSpouseOrChild->setAttributes($data->getAttributes(), false);
+					$clone_IncIncomeSpouseOrChild->IncomeSpouseOrChildId = null;
+					$clone_IncIncomeSpouseOrChild->IncomeId = $income_id;
+					$clone_IncIncomeSpouseOrChild->save(false);
+				}
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncIncomeTaxDeductedAtSource = IncIncomeTaxDeductedAtSource::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			// var_dump($ly_IncIncomeTaxDeductedAtSource);
+			if( isset($ly_IncIncomeTaxDeductedAtSource) && $ly_IncIncomeTaxDeductedAtSource != null ){
+				foreach($ly_IncIncomeTaxDeductedAtSource as $data){
+					$clone_IncIncomeTaxDeductedAtSource = new IncIncomeTaxDeductedAtSource();
+					$clone_IncIncomeTaxDeductedAtSource->setAttributes($data->getAttributes(), false);
+					$clone_IncIncomeTaxDeductedAtSource->TaxDeductId = null;
+					$clone_IncIncomeTaxDeductedAtSource->IncomeId = $income_id;
+					$clone_IncIncomeTaxDeductedAtSource->save(false);
+				}
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncIncomeTaxInAdvance = IncIncomeTaxInAdvance::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			// var_dump($ly_IncIncomeTaxInAdvance);
+			if( isset($ly_IncIncomeTaxInAdvance) && $ly_IncIncomeTaxInAdvance != null ){
+				foreach($ly_IncIncomeTaxInAdvance as $data){
+					$clone_IncIncomeTaxInAdvance = new IncIncomeTaxInAdvance();
+					$clone_IncIncomeTaxInAdvance->setAttributes($data->getAttributes(), false);
+					$clone_IncIncomeTaxInAdvance->TaxAdvanceId = null;
+					$clone_IncIncomeTaxInAdvance->IncomeId = $income_id;
+					$clone_IncIncomeTaxInAdvance->save(false);
+				}
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncInterestOnSecurities = IncInterestOnSecurities::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			// var_dump($ly_IncInterestOnSecurities);
+			if( isset($ly_IncInterestOnSecurities) && $ly_IncInterestOnSecurities != null ){
+				foreach($ly_IncInterestOnSecurities as $data){
+					$clone_IncInterestOnSecurities = new IncInterestOnSecurities();
+					$clone_IncInterestOnSecurities->setAttributes($data->getAttributes(), false);
+					$clone_IncInterestOnSecurities->InterestOnSecuritiesId = null;
+					$clone_IncInterestOnSecurities->IncomeId = $income_id;
+					$clone_IncInterestOnSecurities->save(false);
+				}
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncIncomeAgriculture = IncIncomeAgriculture::model()->findAll('IncomeId=:data',array(':data'=>$old_income_id));
+			// var_dump($ly_IncIncomeAgriculture);
+			if( isset($ly_IncIncomeAgriculture) && $ly_IncIncomeAgriculture != null ){
+				foreach($ly_IncIncomeAgriculture as $data){
+					$clone_IncIncomeAgriculture = new IncIncomeAgriculture();
+					$clone_IncIncomeAgriculture->setAttributes($data->getAttributes(), false);
+					$clone_IncIncomeAgriculture->IncomeAgricultureId = null;
+					$clone_IncIncomeAgriculture->IncomeId = $income_id;
+					$clone_IncIncomeAgriculture->save(false);
+				}
+			}	
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			// ////////////////////////
+			
+			$ly_Income82c = Income82c::model()->find('CPIId=:data AND EntryYear=:data2',array(':data'=>Yii::app()->user->CPIId, ':data2'=>$this->lastTaxYear() ));
+			// var_dump($ly_Income82c);
+			if( isset($ly_Income82c) && $ly_Income82c != null ){
+				$clone_Income82c = new Income82c();
+				$clone_Income82c->setAttributes($ly_Income82c->getAttributes(), false);
+				$clone_Income82c->Income82cId = null;
+				$clone_Income82c->EntryYear = $this->taxYear();
+				$clone_Income82c->IncomeId = $income_id;
+				$clone_Income82c->save(false);
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncomeHouseProperties = IncomeHouseProperties::model()->find('CPIId=:data AND EntryYear=:data2',array(':data'=>Yii::app()->user->CPIId, ':data2'=>$this->lastTaxYear() ));
+			// var_dump($ly_IncomeHouseProperties);
+			if( isset($ly_IncomeHouseProperties) && $ly_IncomeHouseProperties != null ){
+				$clone_IncomeHouseProperties = new IncomeHouseProperties();
+				$clone_IncomeHouseProperties->setAttributes($ly_IncomeHouseProperties->getAttributes(), false);
+				$clone_IncomeHouseProperties->IncomePropertiesId = null;
+				$clone_IncomeHouseProperties->EntryYear = $this->taxYear();
+				$clone_IncomeHouseProperties->IncomeId = $income_id;
+				$clone_IncomeHouseProperties->save(false);
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncomeSalaries = IncomeSalaries::model()->find('CPIId=:data AND EntryYear=:data2',array(':data'=>Yii::app()->user->CPIId, ':data2'=>$this->lastTaxYear() ));
+			// var_dump($ly_IncomeSalaries);
+			if( isset($ly_IncomeSalaries) && $ly_IncomeSalaries != null ){
+				$clone_IncomeSalaries = new IncomeSalaries();
+				$clone_IncomeSalaries->setAttributes($ly_IncomeSalaries->getAttributes(), false);
+				$clone_IncomeSalaries->IncomeSalariesId = null;
+				$clone_IncomeSalaries->EntryYear = $this->taxYear();
+				$clone_IncomeSalaries->IncomeId = $income_id;
+				$clone_IncomeSalaries->save(false);
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncomeShareProfit = IncomeShareProfit::model()->find('CPIId=:data AND EntryYear=:data2',array(':data'=>Yii::app()->user->CPIId, ':data2'=>$this->lastTaxYear() ));
+			// var_dump($ly_IncomeShareProfit);
+			if( isset($ly_IncomeShareProfit) && $ly_IncomeShareProfit != null ){
+				$clone_IncomeShareProfit = new IncomeShareProfit();
+				$clone_IncomeShareProfit->setAttributes($ly_IncomeShareProfit->getAttributes(), false);
+				$clone_IncomeShareProfit->IncomeShareProfitId = null;
+				$clone_IncomeShareProfit->EntryYear = $this->taxYear();
+				$clone_IncomeShareProfit->IncomeId = $income_id;
+				$clone_IncomeShareProfit->save(false);
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncomeTaxPayment = IncomeTaxPayment::model()->find('CPIId=:data AND EntryYear=:data2',array(':data'=>Yii::app()->user->CPIId, ':data2'=>$this->lastTaxYear() ));
+			// var_dump($ly_IncomeTaxPayment);
+			if( isset($ly_IncomeTaxPayment) && $ly_IncomeTaxPayment != null ){
+				$clone_IncomeTaxPayment = new IncomeTaxPayment();
+				$clone_IncomeTaxPayment->setAttributes($ly_IncomeTaxPayment->getAttributes(), false);
+				$clone_IncomeTaxPayment->IncomeTaxPaymentId = null;
+				$clone_IncomeTaxPayment->EntryYear = $this->taxYear();
+				$clone_IncomeTaxPayment->IncomeId = $income_id;
+				$clone_IncomeTaxPayment->save(false);
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}	
+		try{
+			$ly_IncomeTaxRebate = IncomeTaxRebate::model()->find('CPIId=:data AND EntryYear=:data2',array(':data'=>Yii::app()->user->CPIId, ':data2'=>$this->lastTaxYear() ));
+			// var_dump($ly_IncomeTaxRebate);
+			if( isset($ly_IncomeTaxRebate) && $ly_IncomeTaxRebate != null ){
+				$clone_IncomeTaxRebate = new IncomeTaxRebate();
+				$clone_IncomeTaxRebate->setAttributes($ly_IncomeTaxRebate->getAttributes(), false);
+				$clone_IncomeTaxRebate->IncomeTaxRebateId = null;
+				$clone_IncomeTaxRebate->EntryYear = $this->taxYear();
+				$clone_IncomeTaxRebate->IncomeId = $income_id;
+				$clone_IncomeTaxRebate->save(false);
+			}
+		}catch(Exception $e){
+			// echo $e;
+		}
+	}catch(Exception $e){
+		$this->redirect(array('entry#s_7'));
+	}
+		$this->render('copy_startup');
+}
+
+
+
+
+
+}
