@@ -1,0 +1,60 @@
+.yiichat .exceded {
+	color: red;
+}
+
+.yiichat .posts {
+	border: 1px dotted #eee;
+	display: block;
+	margin-bottom: 10px;
+	padding: 3px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	height: 200px;
+}
+
+.yiichat .posts .post {
+	display: block;
+	border: 1px solid #aaa;
+	margin-bottom: 4px;
+	padding: 4px;
+	overflow: auto;
+}
+
+.yiichat .posts .post .track {
+	background-color:  #eee;
+	padding: 3px;
+	color: #333;
+	float: left;
+	overflow: auto;
+	margin-right: 10px;
+}
+
+.yiichat-post-myown {
+	background-color: #ddd;
+}
+
+.yiichat .posts .post .track .time {
+}
+.yiichat .posts .post .track .owner {
+}
+
+/* ADDED BY MANWAR */
+
+#chat_window {
+    position: fixed !important;
+    bottom: 45px !important;
+    right: 0px !important;
+    width: 330px !important;
+    margin: 0px 20px 0px 0px !important;
+    z-index: 100000;
+    background-color: #F1F1F1;
+    height: 370px;
+    border: 2px solid #5F5F5F;
+}
+#cht_btn {
+    position: fixed !important;
+    bottom: 5px !important;
+    right: 0px !important;
+    margin: 0px 20px 0px 0px !important;
+    z-index: 100000;
+}
