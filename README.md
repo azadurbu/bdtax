@@ -18,17 +18,6 @@ If users face any issues or confusions during tax preparation, **experienced tax
 
 ---
 
-## **🛠️ Tech Stack**
-
-| Technology     | Usage                                | Percentage |
-| -------------- | ------------------------------------ | ---------- |
-| **PHP**        | Backend, core business logic         | 59.3%      |
-| **JavaScript** | Frontend interactivity, UI workflows | 34.3%      |
-| **CSS**        | Styling & layout                     | 3.2%       |
-| **HTML**       | Markup & template rendering          | 3.1%       |
-
----
-
 ## **📁 Project Structure**
 
 ```
@@ -93,63 +82,8 @@ project_root/
 
 ---
 
-## **🚀 Getting Started (Development)**
-
-### **Prerequisites**
-
-* PHP 7.x / 8.x
-* MySQL or MariaDB
-* Apache or Nginx
-* Composer (if using dependencies inside the framework folder)
-
-### **Installation**
-
-```bash
-git clone https://github.com/<your-repo>/bdtax.git
-cd bdtax
-```
-
-Configure environment variables / database settings inside:
-
-```
-protected/config/
-```
-
-Launch locally using your preferred stack (XAMPP / LAMP / Laragon / Docker).
-
----
-
-## **🗃️ Backup & Database**
-
-* All backup SQL files are stored in `Database_bk/`
-* Import into MySQL before starting the server
-* Ensure correct DB credentials in configuration files
-
----
-
 ## **📜 License**
 
 This project is proprietary and may contain confidential business logic.
 **Unauthorized copying or distribution is prohibited.**
 
----
-
-## **🤝 Contribution**
-
-For internal team use only.
-Please follow Git branching guidelines:
-
-* `main` → Production
-* `dev` → Development
-* Feature branches → `feature/<name>`
-
-Submit merge requests for review before merging.
-
----
-
-## **📞 Support / Contact**
-
-For platform-related inquiries or collaboration:
-
-**Email:** [support@bdtax.com.bd](mailto:support@bdtax.com.bd)
-**Website:** [https://bdtax.com.bd](https://bdtax.com.bd)
