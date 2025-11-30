@@ -1,20 +1,50 @@
 # **BDTax.com.bd – Online Tax Filing Platform**
 
-Bangladesh’s first and most widely used **online tax filing system**, helping taxpayers prepare and submit their personal income tax returns easily, securely, and in full compliance with Bangladeshi tax laws.
+*A modern digital solution simplifying personal tax filing in Bangladesh.*
+
+BDTax.com.bd is **Bangladesh’s first and most widely used online tax filing platform**, enabling taxpayers to prepare and submit their income tax returns easily, securely, and in full compliance with Bangladeshi tax laws. Operating since **2014**, the system combines automated tax calculations, guided workflows, document management, and generation of **government-office-submittable PDF returns**.
 
 ---
 
-## **📌 Overview**
+## **🌐 Live Platform**
 
-BDTax.com.bd has been operational since **2014**, providing a guided, user-friendly, and legally compliant digital tax filing experience. This platform automates tax calculations, manages necessary documents, and generates **government-office-submittable PDF files** at the end of the process.
-
-If users face any issues or confusions during tax preparation, **experienced tax lawyers** assist them through the full process.
+▶ **[https://bdtax.com.bd](https://bdtax.com.bd)**
 
 ---
 
-## **🌐 Website**
+## **✨ Features**
 
-**[https://bdtax.com.bd](https://bdtax.com.bd)**
+* 🧮 **Guided Tax Filing**
+  Step-by-step workflows, personalized tax calculations, and easy data entry.
+
+* 📑 **Submission-Ready PDF Generation**
+  Produces fully compliant PDF returns accepted in government tax offices.
+
+* 📂 **Document Handling**
+  Upload, store, and manage all required tax documents securely.
+
+* ⚖️ **Tax Law Compliance**
+  Updated rules each assessment year with built-in validation.
+
+* 👨‍⚖️ **Expert Assistance**
+  Experienced tax lawyers guide users through confusing or complex cases.
+
+* 🔐 **Security & Privacy**
+  Strong encryption, secure authentication, and protection for sensitive financial data.
+
+---
+
+## **🛠️ Tech Stack**
+
+**Backend:** PHP
+**Frontend:** JavaScript, HTML, CSS
+**Other:** PDF generation libraries, custom tax computation modules
+**Languages Breakdown:**
+
+* PHP — 59.3%
+* JavaScript — 34.3%
+* CSS — 3.2%
+* HTML — 3.1%
 
 ---
 
@@ -25,18 +55,18 @@ project_root/
 │
 ├── Database_bk/          # Backup or exported database files
 ├── assets/               # Frontend static assets (images, icons, scripts, etc.)
-├── cgi-bin/              # Scripts executed on the server (if applicable)
+├── cgi-bin/              # Server-side scripts (if used)
 ├── css/                  # Stylesheets
 ├── fonts/                # Custom or web fonts
 ├── framework/            # Internal or third-party PHP framework components
 ├── images/               # Image assets
 ├── img/                  # Additional images (legacy folder)
-├── import_data/          # Data import files or templates
+├── import_data/          # Data import files or tax templates
 ├── js/                   # JavaScript files
-├── protected/            # Secure application logic, configs, controllers, models
+├── protected/            # Application logic, models, controllers, configs
 │
 ├── error_log             # Server/PHP error log
-├── favicon.ico           # Favicon for browser tabs
+├── favicon.ico           # Browser icon
 ├── .gitattributes        # Git attributes configuration
 ├── .gitignore            # Git ignore rules
 └── index.php             # Application entry point
@@ -44,46 +74,10 @@ project_root/
 
 ---
 
-## **✨ Key Features**
+## **📈 Highlights**
 
-### **1. Guided Tax Filing**
-
-* Interactive workflows
-* Personalized tax calculations
-* Step-by-step instructions
-
-### **2. Automated Document Handling**
-
-* Upload and manage required tax documents
-* Secure cloud storage
-* Easy retrieval anytime
-
-### **3. Compliance with Bangladesh Tax Law**
-
-* Updated tax rules every assessment year
-* Automatic validation to avoid errors
-
-### **4. Generate Submission-Ready PDF**
-
-* A fully compliant return file
-* Accepted in government tax offices
-* Includes detailed statements & forms
-
-### **5. Expert Support**
-
-* Real-time help from professional tax lawyers
-* Clarifications for complex tax scenarios
-
-### **6. Security & Privacy**
-
-* Industry-standard encryption
-* Protection of personal and financial data
-* Secure authentication flow
-
----
-
-## **📜 License**
-
-This project is proprietary and may contain confidential business logic.
-**Unauthorized copying or distribution is prohibited.**
-
+* Powers real-world tax filing for thousands of users across Bangladesh
+* Automates complex tax rules, calculations, and validation checks
+* Produces government-approved PDF return forms
+* Designed for stability, clarity, and ease of use
+* Built with a combination of **secure backend logic** and **interactive frontend workflows**
